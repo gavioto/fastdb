@@ -3041,10 +3041,14 @@ enum ComponentType {
     StructureComponent
 };
 
-void httpDumpRecord(WWWconnection& con, byte* base, dbFieldDescriptor* first, ComponentType componentType)
+void httpDumpRecord(WWWconnection& con, byte* base, dbFieldDescriptor* first, ComponentType componentType,
+                    int &buttonCounter, const char *condition, int buttonIndex)
 {
     int i, n;
     byte* elem;
+    // only maxDumpArrayLength entries will be shown for an array. 
+    // To turn off this feature, set maxDumpArrayLength to zero.
+    const int maxDumpArrayLength = 20;
     dbFieldDescriptor* fd = first;
     do {
         if (componentType == StructureComponent) { 
@@ -3118,19 +3122,49 @@ void httpDumpRecord(WWWconnection& con, byte* base, dbFieldDescriptor* first, Co
             con << TAG << "\"";
             break;
           case dbField::tpArray:
-            n = ((dbVarying*)(base + fd->dbsOffs))->size;
-            elem = base + ((dbVarying*)(base + fd->dbsOffs))->offs;
-            con << TAG << "<OL>";
-            for (i = 0; i < n; i++) {
-                con << TAG << "<LI>";                
-                httpDumpRecord(con, elem, fd->components, ArrayComponent);
-                elem += fd->components->dbsSize;
-            }
-            con << TAG << "</OL>";
+            {
+                n = ((dbVarying*)(base + fd->dbsOffs))->size;
+                elem = base + ((dbVarying*)(base + fd->dbsOffs))->offs;
+                con << TAG << "<OL>";
+
+                // limit array size to maxDumpArrayLength
+                bool bigList = false;
+                bool showButton = false;
+                int oldn = n;
+                if (maxDumpArrayLength > 0 && n > maxDumpArrayLength) { 
+                    bigList = true; }
+
+                if (bigList && buttonCounter != buttonIndex) {
+                    n = maxDumpArrayLength;
+                    showButton = true;
+                }
+
+                for (i = 0; i < n; i++) {
+                    con << TAG << "<LI>";                
+                    httpDumpRecord(con, elem, fd->components, ArrayComponent, buttonCounter, condition, buttonIndex);
+                    elem += fd->components->dbsSize;
+                }
+                con << TAG << "</OL>";
+
+                if (showButton)
+                {
+                    con << TAG << "<P align=\"center\"><FORM METHOD=POST ACTION=\"" << con.getStub() << "\">" 
+                                  "<INPUT TYPE=HIDDEN NAME=socket VALUE=\"" << con.getAddress() << "\">"
+                                  "<INPUT TYPE=hidden NAME=page VALUE=selectionPage>"
+                                  "<INPUT TYPE=hidden NAME=table VALUE=\"" << first->defTable->getName() << "\">"
+                                  "<INPUT TYPE=hidden NAME=query VALUE=\"" << condition << "\">"
+                                  "<INPUT TYPE=hidden NAME=button VALUE=\"" << buttonCounter << "\">"
+                                  "<INPUT TYPE=submit VALUE=\"Full list (" << oldn << ")\"></FORM></P>";
+                }
+
+                if (bigList)
+                   buttonCounter++;
+
+            } // case
             break;
           case dbField::tpStructure:
             con << TAG << "<TABLE BORDER>"; 
-            httpDumpRecord(con, base, fd->components,RecordComponent);
+            httpDumpRecord(con, base, fd->components,RecordComponent, buttonCounter, condition, buttonIndex);
             con << TAG << "</TABLE>"; 
         }
         if (componentType == StructureComponent) { 
@@ -3151,6 +3185,12 @@ void dbSubSql::selectionPage(WWWconnection& con)
 {
     char const* tableName = con.get("table");
     char const* condition = con.get("query");
+    char const* buttonNr  = con.get("button");
+
+    int buttonIndex = -1;
+    if (buttonNr) {
+        buttonIndex = atoi(buttonNr); }
+
     dbTableDescriptor* desc = findTableByName(tableName);
     if (desc == NULL) {
         httpError(con, "No such table");
@@ -3207,12 +3247,14 @@ void dbSubSql::selectionPage(WWWconnection& con)
         con << TAG << "</TR>";
 
         int nSelected = 0;
+        int buttonCounter = 0;        
         if (cursor.gotoFirst()) {
             do {
                 nSelected += 1;
                 con << TAG << "<TR><TD>@" << cursor.currId << "</TD>";
                 httpDumpRecord(con, (byte*)getRow(cursor.currId),
-                               cursor.table->columns, RecordComponent);
+                               cursor.table->columns, RecordComponent,
+                               buttonCounter, condition, buttonIndex);
                 con << TAG << "</TR>";
             } while (cursor.gotoNext());
             con << TAG << "</TABLE>";

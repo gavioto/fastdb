@@ -990,3 +990,4 @@ that not all fields are described was produced incorrectly)
 
 --- Release version 3.66 ??.01.2011 -------------------------------------
 1. Change return type of select method to be able to selcet more than 2Gb records
+2. Patch of SubSQL HTML dump done by Christen Volker improving visualisation of large arrays
