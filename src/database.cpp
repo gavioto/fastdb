@@ -5278,11 +5278,15 @@ inline void dbDatabase::extend(offs_t size)
             beginTransaction(dbCommitLock);
         }
         if (oldSize*2 > size) { 
-            if (fileSizeLimit == 0 || oldSize*2 <= fileSizeLimit) { 
-                if (offs_t(oldSize*2) == 0) { // overflow
+            size_t newSize = 64*1024;
+            while (newSize < size) { 
+                newSize <<= 1;
+            }
+            if (fileSizeLimit == 0 || newSize <= fileSizeLimit) { 
+                if (offs_t(newSize) == 0) { // overflow
                     handleError(FileLimitExeeded);
                 }
-                size = (offs_t)(oldSize*2);
+                size = (offs_t)newSize;
             } else if (fileSizeLimit > size) { 
                 size = (offs_t)fileSizeLimit;
             }

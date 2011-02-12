@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
         return 1;
     }
     dbHeader rec;
-    if (fread(&rec, sizeof(dbRecord), 1, f) != 1) { 
+    if (fread(&rec, sizeof(dbHeader), 1, f) != 1) { 
         fprintf(stderr, "Failed to read database header\n");
         return 1;
     }
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     }
     rec.dirty = dirty;
     fseek(f, 0, 0);
-    if (fwrite(&rec, sizeof(dbRecord), 1, f) != 1) { 
+    if (fwrite(&rec, sizeof(dbHeader), 1, f) != 1) { 
         fprintf(stderr, "Failed to write database header\n");
         return 1;
     }
