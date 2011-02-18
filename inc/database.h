@@ -1871,6 +1871,11 @@ class FASTDB_DLL_ENTRY dbDatabase
      */
     void markAsAllocated(offs_t pos, int objBitSize);
 
+  private:
+    /**
+     * Prohibit copying of dbDatabase class
+     */
+    dbDatabase(dbDatabase const& other);
 };
 
 
