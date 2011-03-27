@@ -570,7 +570,7 @@ void dbFile::unprotect(size_t pos, size_t size)
 #endif
 
 
-inline bool SetFilePosition(HANDLE h, size_t pos) 
+inline bool SetFilePosition(HANDLE fh, size_t pos) 
 {
 #ifdef _WIN64
     DWORD posHigh = (DWORD)(pos >> 32);
