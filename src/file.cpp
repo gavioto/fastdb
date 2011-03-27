@@ -570,6 +570,17 @@ void dbFile::unprotect(size_t pos, size_t size)
 #endif
 
 
+inline bool SetFilePosition(HANDLE h, size_t pos) 
+{
+#ifdef _WIN64
+    DWORD posHigh = (DWORD)(pos >> 32);
+    DWORD posLow = SetFilePointer(fh, (LONG)pos, &posHigh, FILE_BEGIN);
+    retrun ((size_t(posHigh) << 32) | posLow) == pos;
+#else 
+    return SetFilePointer(fh, pos, NULL, FILE_BEGIN) == pos; 
+#endif
+}
+
 int dbFile::open(char_t const* fileName, char_t const* sharedName, int flags,
                  size_t initSize, bool replicationSupport)
 {
@@ -610,7 +621,11 @@ int dbFile::open(char_t const* fileName, char_t const* sharedName, int flags,
             CloseHandle(fh);
             return status;
         }
+#ifdef _WIN64
+        fileSize |= size_t(highSize) << 32;
+#else
         assert(highSize == 0);
+#endif
     }
     mmapSize = fileSize;
 
@@ -631,7 +646,7 @@ int dbFile::open(char_t const* fileName, char_t const* sharedName, int flags,
 #endif
 #if defined(NO_MMAP)
     if (fileSize < mmapSize && (flags & (read_only|ram_file)) == 0) { 
-        if (SetFilePointer(fh, mmapSize, NULL, FILE_BEGIN) != mmapSize || !SetEndOfFile(fh)) {
+        if (!SetFilePosition(fh, mmapSize) || !SetEndOfFile(fh)) {
             status = GetLastError();
             CloseHandle(fh);
             return status;
@@ -777,12 +792,7 @@ bool dbFile::write(size_t pos, void const* ptr, size_t size)
 {
     assert((flags & ram_file) == 0);
     DWORD written;
-#ifdef _WIN64
-    LONG posHigh = (LONG)(pos >> 32);
-#else
-    LONG posHigh = 0;
-#endif
-    if (SetFilePointer(fh, (LONG)pos, &posHigh, FILE_BEGIN) != pos ||
+    if (!SetFilePosition(fh, pos) ||
         !WriteFile(fh, ptr, (DWORD)size, &written, NULL) 
         || written != (DWORD)size) 
     { 
@@ -1029,7 +1039,7 @@ int dbFile::setSize(size_t size, char_t const* sharedName, bool initialize)
     if (newBuf == NULL) { 
         return GetLastError();
     }
-    if (SetFilePointer(fh, size, NULL, FILE_BEGIN) != size || !SetEndOfFile(fh)) {
+    if (!SetFilePosition(fh, size) || !SetEndOfFile(fh)) {
         return GetLastError();
     }
 
@@ -1063,7 +1073,7 @@ int dbFile::setSize(size_t size, char_t const* sharedName, bool initialize)
     if (mmapAddr == NULL) {
         status = GetLastError();
         CloseHandle(mh);
-        SetFilePointer(fh, mmapSize, NULL, FILE_BEGIN);
+        SetFilePosition(fh, mmapSize);
         SetEndOfFile(fh);
 #ifdef _WIN64
         sizeHigh = (DWORD)(mmapSize >> 32);
