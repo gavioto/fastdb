@@ -115,6 +115,22 @@ class std_tmp_allocator {
     void deallocate(pointer, size_t) {
     }
  
+	void construct(pointer _Ptr, const T& _Val)
+    {	// construct object at _Ptr with value _Val
+		new((void*)_Ptr) T(_Val);
+    }
+
+	template<class _Other>
+    void construct(pointer _Ptr, _Other&& _Val)
+    {	// construct object at _Ptr with value _Val
+		::new ((void *)_Ptr) T((_Other&&)_Val);
+    }
+
+	void destroy(pointer _Ptr)
+    {	// destroy *_Ptr
+		_Ptr->~T();
+    }
+
     size_t max_size() const {
         size_t n = (size_t)(-1) / sizeof(T);
         return (0 < n ? n : 1);
