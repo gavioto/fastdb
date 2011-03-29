@@ -120,12 +120,6 @@ class std_tmp_allocator {
 		new((void*)_Ptr) T(_Val);
     }
 
-	template<class _Other>
-    void construct(pointer _Ptr, _Other&& _Val)
-    {	// construct object at _Ptr with value _Val
-		::new ((void *)_Ptr) T((_Other&&)_Val);
-    }
-
 	void destroy(pointer _Ptr)
     {	// destroy *_Ptr
 		_Ptr->~T();
