@@ -993,3 +993,7 @@ that not all fields are described was produced incorrectly)
 2. Patch of SubSQL HTML dump done by Christen Volker improving visualisation of large arrays
 3. Fix problem with doubling database size after backup
 4. Visual Studio 10 compatibilty fixes
+
+--- Release version 3.67 ??.03.2011 -------------------------------------
+1. Fix bug in handling string->wstring field type change.
+
