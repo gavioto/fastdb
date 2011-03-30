@@ -989,9 +989,11 @@ size_t dbFieldDescriptor::convertRecord(byte* dst, byte* src, size_t offs)
                 offs += sizeof(wchar_t);
             } else if (fd->oldDbsType == dbField::tpString) { 
                 ((dbVarying*)(dst + fd->dbsOffs))->offs = (int)offs;
-                ((dbVarying*)(dst + fd->dbsOffs))->size = mbstowcs((wchar_t*)(dst + offs), 
-                                                                   (char*)src + ((dbVarying*)(src+fd->oldDbsOffs))->offs,
-                                                                   ((dbVarying*)(dst + fd->dbsOffs))->size) + 1;
+                ((dbVarying*)(dst + fd->dbsOffs))->size = 
+                    mbstowcs(NULL, (char*)src + ((dbVarying*)(src+fd->oldDbsOffs))->offs, 0) + 1;
+                mbstowcs((wchar_t*)(dst + offs), 
+                         (char*)src + ((dbVarying*)(src+fd->oldDbsOffs))->offs,
+                         ((dbVarying*)(dst + fd->dbsOffs))->size);
                 offs += ((dbVarying*)(dst + fd->dbsOffs))->size*sizeof(wchar_t);
             } else { 
                 size_t len = 
