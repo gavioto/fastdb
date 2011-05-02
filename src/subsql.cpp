@@ -27,6 +27,8 @@
 #define SERVER_SUPPORTED 0
 #endif
 
+BEGIN_FASTDB_NAMESPACE
+
 static char* typeMnem[] = {
         "Boolean",
         "Int1",
@@ -3347,6 +3349,7 @@ void  dbSubSql::httpServerLoop()
 }
 #endif
 
+END_FASTDB_NAMESPACE
 
 #ifdef _WINCE
 
@@ -3402,7 +3405,7 @@ int main(int argc, char* argv[])
 #endif // VXWORKS
 #endif // !_WINCE
     char* subsqlAccessType = getenv("SUBSQL_ACCESS_TYPE");    
-    dbDatabase::dbAccessType accessType = dbDatabase::dbAllAccess;
+    FASTDB_NS::dbDatabase::dbAccessType accessType = FASTDB_NS::dbDatabase::dbAllAccess;
     int firstParam = 1;
     if (argc > 1 && (strcmp(argv[1], "-?") == 0 || strcmp(argv[1], "-h") == 0)) { 
         printf("SubSQL interactive utility for FastDB v. %d.%.02d\n",
@@ -3422,11 +3425,11 @@ int main(int argc, char* argv[])
     }         
     if (subsqlAccessType != NULL) { 
         if (strcmp(subsqlAccessType, "read-only") == 0) { 
-            accessType = dbDatabase::dbReadOnly;
+            accessType = FASTDB_NS::dbDatabase::dbReadOnly;
         } else if (strcmp(subsqlAccessType, "concurrent-read") == 0) { 
-            accessType = dbDatabase::dbConcurrentRead;
+            accessType = FASTDB_NS::dbDatabase::dbConcurrentRead;
         } else if (strcmp(subsqlAccessType, "concurrent-update") == 0) { 
-            accessType = dbDatabase::dbConcurrentUpdate;
+            accessType = FASTDB_NS::dbDatabase::dbConcurrentUpdate;
         } else if (strcmp(subsqlAccessType, "normal") && strcmp(subsqlAccessType, "all-access") 
                    && strcmp(subsqlAccessType, "read-write") && strcmp(subsqlAccessType, "update"))
         {
@@ -3434,7 +3437,7 @@ int main(int argc, char* argv[])
             return 1;
         }
     }
-    dbSubSql db(accessType);
+    FASTDB_NS::dbSubSql db(accessType);
     db.run(firstParam, argc, argv);
     return 0;
 }

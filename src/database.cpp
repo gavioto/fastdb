@@ -2715,68 +2715,75 @@ void dbDatabase::scheduleBackup(char_t const* fileName, time_t period)
 void dbDatabase::backupScheduler() 
 { 
     backupThread.setPriority(dbThread::THR_PRI_LOW);
-    dbCriticalSection cs(backupMutex); 
-    while (true) { 
-        time_t timeout = backupPeriod;
-        if (backupFileName[_tcslen(backupFileName)-1] != '?') {
+    attach();
+    {
+        dbCriticalSection cs(backupMutex); 
+        while (true) { 
+            if (!opened || backupFileName == NULL) { 
+                break;
+            }
+            time_t timeout = backupPeriod;
+            if (backupFileName[_tcslen(backupFileName)-1] != '?') {
 #if defined(_WINCE) || defined(_WIN32)
-            WIN32_FIND_DATA lData;
-            HANDLE lFile = ::FindFirstFile(backupFileName, &lData);
-            FILETIME lATime;
-            if (::GetFileTime(lFile, 0l, &lATime, 0l) == TRUE)
-            {
-                ULARGE_INTEGER lNTime = *(ULARGE_INTEGER*)&lATime;                
-                time_t howOld = time(NULL) - *(time_t*)&lNTime;
-                if (timeout < howOld) { 
-                    timeout = 0;
-                } else { 
-                    timeout -= howOld;
+                WIN32_FIND_DATA lData;
+                HANDLE lFile = ::FindFirstFile(backupFileName, &lData);
+                FILETIME lATime;
+                if (::GetFileTime(lFile, 0l, &lATime, 0l) == TRUE)
+                {
+                    ULARGE_INTEGER lNTime = *(ULARGE_INTEGER*)&lATime;                
+                    time_t howOld = time(NULL) - *(time_t*)&lNTime;
+                    if (timeout < howOld) { 
+                        timeout = 0;
+                    } else { 
+                        timeout -= howOld;
+                    }
                 }
-            }
-            ::FindClose(lFile);
+                ::FindClose(lFile);
 #else    
-            STATSTRUCT st;
-            if (::_tstat(backupFileName, &st) == 0) { 
-                time_t howOld = time(NULL) - st.st_atime;
-                if (timeout < howOld) { 
-                    timeout = 0;
-                } else { 
-                    timeout -= howOld;
+                STATSTRUCT st;
+                if (::_tstat(backupFileName, &st) == 0) { 
+                    time_t howOld = time(NULL) - st.st_atime;
+                    if (timeout < howOld) { 
+                        timeout = 0;
+                    } else { 
+                        timeout -= howOld;
+                    }
                 }
-            }
 #endif
-        }
+            }
         
-        backupInitEvent.wait(backupMutex, timeout*1000);
-        
-        if (backupFileName != NULL) { 
-            if (backupFileName[_tcslen(backupFileName)-1] == _T('?')) {
-                time_t currTime = time(NULL);
-                char_t* fileName = new char_t[_tcslen(backupFileName) + 32];
-                struct tm* t = localtime(&currTime);
-                _stprintf(fileName, _T("%.*s-%04d.%02d.%02d_%02d.%02d.%02d"), 
-                        (int)_tcslen(backupFileName)-1, backupFileName,
-                        t->tm_year + 1900, t->tm_mon+1, t->tm_mday, 
-                        t->tm_hour, t->tm_min, t->tm_sec);
-                backup(fileName, false);
-                delete[] fileName;
-            } else { 
-                char_t* newFileName = new char_t[_tcslen(backupFileName) + 5];
-                _stprintf(newFileName,_T("%s.new"), backupFileName);
-                backup(newFileName, false);
+            backupInitEvent.wait(backupMutex, timeout*1000);
+            
+            if (backupFileName != NULL) { 
+                if (backupFileName[_tcslen(backupFileName)-1] == _T('?')) {
+                    time_t currTime = time(NULL);
+                    char_t* fileName = new char_t[_tcslen(backupFileName) + 32];
+                    struct tm* t = localtime(&currTime);
+                    _stprintf(fileName, _T("%.*s-%04d.%02d.%02d_%02d.%02d.%02d"), 
+                              (int)_tcslen(backupFileName)-1, backupFileName,
+                              t->tm_year + 1900, t->tm_mon+1, t->tm_mday, 
+                              t->tm_hour, t->tm_min, t->tm_sec);
+                    backup(fileName, false);
+                    delete[] fileName;
+                } else { 
+                    char_t* newFileName = new char_t[_tcslen(backupFileName) + 5];
+                    _stprintf(newFileName,_T("%s.new"), backupFileName);
+                    backup(newFileName, false);
 #ifdef _WINCE
-                DeleteFile(backupFileName);
-                MoveFile(newFileName, backupFileName);
+                    DeleteFile(backupFileName);
+                    MoveFile(newFileName, backupFileName);
 #else
-                ::_tremove(backupFileName);
-                ::_trename(newFileName, backupFileName);
+                    ::_tremove(backupFileName);
+                    ::_trename(newFileName, backupFileName);
 #endif
-                delete[] newFileName;
+                    delete[] newFileName;
+                }
+            } else { 
+                break;
             }
-        } else { 
-            return;
         }
     }
+    detach(DESTROY_CONTEXT);
 }    
 
 

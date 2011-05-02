@@ -11,7 +11,7 @@
 #ifndef __SUBSQL_H__
 #define __SUBSQL_H__
 
-USE_FASTDB_NAMESPACE
+BEGIN_FASTDB_NAMESPACE
 
 enum SubSqlTokens { 
     tkn_alter = tkn_last_token,
@@ -224,5 +224,7 @@ class dbSubSql : public dbDatabase {
     dbSubSql(dbAccessType accessType);
     virtual~dbSubSql();
 };   
+
+END_FASTDB_NAMESPACE
 
 #endif
