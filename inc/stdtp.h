@@ -111,6 +111,7 @@ typedef char char_t;
 #include <time.h>
 #include <ctype.h>
 #include <wctype.h>
+#include <sys/stat.h>
 
 #ifdef _WIN32
 #include <malloc.h>
