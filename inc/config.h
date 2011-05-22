@@ -38,7 +38,7 @@
 //#define FASTDB_DEBUG DEBUG_TRACE_ALL
 
 // USE_NAMESPACES - place FastDB classes in separate namespace  
-#define USE_NAMESPACES 1
+//#define USE_NAMESPACES 1
 
 // SECURE_SERVER - enable authentication for remote logins: keep user/password table, 
 //   check password for remote logins

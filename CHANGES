@@ -994,7 +994,8 @@ that not all fields are described was produced incorrectly)
 3. Fix problem with doubling database size after backup
 4. Visual Studio 10 compatibilty fixes
 
---- Release version 3.67 ??.04.2011 -------------------------------------
+--- Release version 3.67 06.05.2011 -------------------------------------
 1. Fix bug in handling string->wstring field type change.
 2. Fix bug with scheduled incremental backup
 3. Fix namespace support
+4. Fix fuzzy checkpoints
