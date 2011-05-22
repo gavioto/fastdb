@@ -665,7 +665,7 @@ int dbFile::open(char_t const* fileName, char_t const* sharedName, int flags,
     {  
         status = GetLastError();
         if (fh != INVALID_HANDLE_VALUE) { 
-            ClossizeHigheHandle(fh);
+            CloseHandle(fh);
         }
         return status;
     } 
@@ -1010,9 +1010,9 @@ int dbFile::flush(bool physical)
         }
     }
 #endif
-#if !defined(DISKLESS_CONFIGURATION) && !defined(REPLICATION_SUPPORT) && !defined(NO_FLUSH_ON_COMMIT)
+#if !defined(FUZZY_CHECKPOINT) && !defined(DISKLESS_CONFIGURATION) && !defined(REPLICATION_SUPPORT) && !defined(NO_FLUSH_ON_COMMIT)
 #ifdef NO_MMAP
-    if ((flags & (ram_file|no_sync)) == 0 && !FlushFileBuffers(fh)))
+    if ((flags & (ram_file|no_sync)) == 0 && !FlushFileBuffers(fh))
 #else
     if ((flags & (ram_file|no_sync)) == 0 && !FlushViewOfFile(mmapAddr, mmapSize))
 #endif
