@@ -6699,7 +6699,9 @@ void dbDatabase::rollback()
         logger->rollback();
     }
     dbDatabaseThreadContext* ctx = threadContext.get();
-
+    if (commitDelay != 0) {
+        beginTransaction(dbExclusiveLock);
+    }
     if (modified
         && (monitor->uncommittedChanges || ctx->writeAccess || ctx->mutatorCSLocked || ctx->concurrentId == monitor->concurrentTransId))
     { 

@@ -999,3 +999,6 @@ that not all fields are described was produced incorrectly)
 2. Fix bug with scheduled incremental backup
 3. Fix namespace support
 4. Fix fuzzy checkpoints
+
+--- Release version 3.68 ??.05.2011 -------------------------------------
+2. Fix bug in rollback of transaction in delayed commit mode
