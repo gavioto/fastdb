@@ -35,7 +35,6 @@ int main()
 {
     char_t* databaseName = _T("clitest");
     char_t* filePath = _T("clitest2.fdb");
-	FILE *ifp;
     int statement, statement2;
     int session;
     int table_created = 0;
@@ -188,10 +187,6 @@ int main()
 	    return EXIT_FAILURE;
 	}
     }    
-	//added 3 lines
-	ifp = fopen("prova.xml", "w");
-	rc=cli_xml_export(session,ifp);
-	fclose(ifp);
 
     if ((rc = cli_close(session)) != cli_ok) { 
         fprintf(stderr, "cli_close failed with code %d\n", rc);
