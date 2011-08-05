@@ -2673,7 +2673,7 @@ bool dbDatabase::open(char_t const* dbName, char_t const* fiName,
     monitor->users += 1;
     selfId = ++monitor->clientId;
 #ifdef AUTO_DETECT_PROCESS_CRASH
-    sprintf(databaseName + databaseNameLen, ".pid.%ld", selfId);
+    _stprintf(databaseName + databaseNameLen, _T(".pid.%ld"), selfId);
     selfWatchDog.create(databaseName);
     watchDogMutex = new dbMutex();
 #endif
@@ -6092,7 +6092,7 @@ void dbDatabase::startWatchDogThreads()
     while (maxClientId < monitor->clientId) { 
         long id = ++maxClientId;
         if (id != selfId) { 
-            sprintf(databaseName + databaseNameLen, ".pid.%ld", id);
+            _stprintf(databaseName + databaseNameLen, _T(".pid.%ld"), id);
             dbWatchDogContext* ctx = new dbWatchDogContext();
             if (ctx->watchDog.open(databaseName)) {
                 watchDogThreadContexts.link(ctx);
@@ -7362,7 +7362,7 @@ bool dbReplicatedDatabase::open(OpenParameters& params)
     return open(params.databaseName, params.databaseFilePath, params.nodeId, params.nodeAddresses, params.nNodes);
 }
 
-bool dbReplicatedDatabase::open(char const* dbName, char const* fiName,
+bool dbReplicatedDatabase::open(char_t const* dbName, char_t const* fiName,
                                 int id, char* servers[], int nServers)
 {
     int i;
@@ -7390,16 +7390,16 @@ bool dbReplicatedDatabase::open(char const* dbName, char const* fiName,
     stopDelayedCommitThread = false;
     onlineRecovery = false;
     memset(tableHash, 0, sizeof tableHash);
-    databaseNameLen = strlen(dbName);
-    char* name = new char[databaseNameLen+16];
-    sprintf(name, "%s.in", dbName);
+    databaseNameLen = (int)_tcslen(dbName);
+    char_t* name = new char_t[databaseNameLen+16];
+    _stprintf(name, _T("%s.in"), dbName);
     databaseName = name;
     if (fiName == NULL) { 
-        fileName = new char[databaseNameLen + 5];
-        sprintf(fileName, "%s.fdb", dbName);
+        fileName = new char_t[databaseNameLen + 5];
+        _stprintf(fileName, _T("%s.fdb"), dbName);
     } else { 
-        fileName = new char[strlen(fiName)+1];
-        strcpy(fileName, fiName);
+        fileName = new char_t[_tcslen(fiName)+1];
+        _stprintf(fileName, fiName);
     }
 
     dbInitializationMutex::initializationStatus status = initMutex.initialize(name);
@@ -7411,35 +7411,35 @@ bool dbReplicatedDatabase::open(char const* dbName, char const* fiName,
         handleError(DatabaseOpenError, "Database is already started");
         return false;
     }
-    sprintf(name, "%s.dm", dbName);
+    _stprintf(name, _T("%s.dm"), dbName);
     if (!shm.open(name)) { 
         handleError(DatabaseOpenError, "Failed to open database monitor");
         cleanup(status, 0);
         return false;
     }
     monitor = shm.get();
-    sprintf(name, "%s.ws", dbName);
+    _stprintf(name, _T("%s.ws"), dbName);
     if (!writeSem.open(name)) { 
         handleError(DatabaseOpenError, 
                     "Failed to initialize database writers semaphore");
         cleanup(status, 1);
         return false;
     }
-    sprintf(name, "%s.rs", dbName);
+    _stprintf(name, _T("%s.rs"), dbName);
     if (!readSem.open(name)) { 
         handleError(DatabaseOpenError, 
                     "Failed to initialize database readers semaphore");
         cleanup(status, 2);
         return false;
     }
-    sprintf(name, "%s.us", dbName);
+    _stprintf(name, _T("%s.us"), dbName);
     if (!upgradeSem.open(name)) { 
         handleError(DatabaseOpenError, 
                     "Failed to initialize database upgrade semaphore");
         cleanup(status, 3);
         return false;
     }
-    sprintf(name, "%s.bce", dbName);
+    _stprintf(name, _T("%s.bce"), dbName);
     if (!backupCompletedEvent.open(name)) { 
         handleError(DatabaseOpenError, 
                     "Failed to initialize database backup completed event");
@@ -7474,14 +7474,14 @@ bool dbReplicatedDatabase::open(char const* dbName, char const* fiName,
     maxClientId = 0;
     attach();
     
-    sprintf(name, "%s.cs", dbName);
+    _stprintf(name, _T("%s.cs"), dbName);
     if (!cs.create(name, &monitor->sem)) { 
         handleError(DatabaseOpenError, "Failed to initialize database monitor");
         cleanup(status, 5);
         return false;
     }
     if (accessType == dbConcurrentUpdate || accessType == dbConcurrentRead) { 
-        sprintf(name, "%s.mcs", dbName);
+        _stprintf(name, _T("%s.mcs"), dbName);
         if (!mutatorCS.create(name, &monitor->mutatorSem)) { 
             cleanup(status, 6);
             handleError(DatabaseOpenError,
@@ -7517,7 +7517,7 @@ bool dbReplicatedDatabase::open(char const* dbName, char const* fiName,
     monitor->sessionFreeList[1].head = monitor->sessionFreeList[1].tail = 0;
 #endif                
 
-    sprintf(databaseName, "%s.%d", dbName, version);
+    _stprintf(databaseName, _T("%s.%d"), dbName, version);
     if (file.open(fileName, databaseName, fileOpenFlags, fileSize, true) != dbFile::ok)
     {
         handleError(DatabaseOpenError, "Failed to create database file");
@@ -7630,7 +7630,7 @@ bool dbReplicatedDatabase::open(char const* dbName, char const* fiName,
     monitor->users += 1;
     selfId = ++monitor->clientId;
 #ifdef AUTO_DETECT_PROCESS_CRASH
-    sprintf(databaseName + databaseNameLen, ".pid.%ld", selfId);
+    _stprintf(databaseName + databaseNameLen, _T(".pid.%ld"), selfId);
     selfWatchDog.create(databaseName);
     watchDogMutex = new dbMutex();
 #endif

@@ -1978,7 +1978,7 @@ class FASTDB_DLL_ENTRY dbReplicatedDatabase : public dbDatabase {
                   void* body = NULL, size_t bodySize = 0);
     bool writeResp(int nodeId, ReplicationRequest const& hdr);
 
-    bool open(char const* databaseName, char const* fileName,
+    bool open(char_t const* databaseName, char_t const* fileName,
               int id, char* servers[], int nServers);
     bool open(OpenParameters& params);
 
