@@ -111,7 +111,6 @@ typedef char char_t;
 #include <time.h>
 #include <ctype.h>
 #include <wctype.h>
-#include <sys/stat.h>
 
 #ifdef _WIN32
 #include <malloc.h>
@@ -204,6 +203,7 @@ extern FASTDB_DLL_ENTRY void dbTrace(char* message, ...);
 		#define _tcscmp wcscmp
 		#define _tcslen wcslen
 		#define _tcscpy wcscpy
+		#define _tcscat wcscat
 		#define _tstat  _wstat
 		#define _tremove _wremove
 		#define _trename _wrename
@@ -227,6 +227,7 @@ extern FASTDB_DLL_ENTRY void dbTrace(char* message, ...);
 		#define _tcscmp strcmp
 		#define _tcslen strlen
 		#define _tcscpy strcpy
+		#define _tcscat strcat
 		#define _tstat stat
 		#define _tremove remove
 		#define _trename rename

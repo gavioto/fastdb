@@ -721,8 +721,8 @@ int dbFile::open(char_t const* fileName, char_t const* sharedName, int flags,
     currUpdateCount = new int[nPages];
 
     if (replicationSupport) { 
-        char* cFileName = new char[strlen(fileName) + 5];
-        strcat(strcpy(cFileName, fileName), ".cnt");
+        char_t* cFileName = new char_t[_tcslen(fileName) + 5];
+        _tcscat(_tcscpy(cFileName, fileName), _T(".cnt"));
         
 #ifdef DISKLESS_CONFIGURATION
         cfh = INVALID_HANDLE_VALUE;
