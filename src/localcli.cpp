@@ -124,8 +124,8 @@ int dbCLI::create_session(char_t const* databaseName,
 int cli_create_replication_node(int         nodeId,
                                 int         nServers,
                                 char*       nodeNames[],
-                                char const* databaseName, 
-                                char const* filePath, 
+                                char_t const* databaseName, 
+                                char_t const* filePath, 
                                 int         openAttr, 
                                 size_t      initDatabaseSize,
                                 size_t      extensionQuantum,
@@ -147,8 +147,8 @@ int cli_create_replication_node(int         nodeId,
 int dbCLI::create_replication_node(int         nodeId,
                                    int         nServers,
                                    char*       nodeNames[],
-                                   char const* databaseName, 
-                                   char const* filePath, 
+                                   char_t const* databaseName, 
+                                   char_t const* filePath, 
                                    int         openAttr, 
                                    size_t      initDatabaseSize,
                                    size_t      extensionQuantum,
@@ -160,7 +160,7 @@ int dbCLI::create_replication_node(int         nodeId,
     dbDatabase* db = NULL; 
     session_desc* s;
     for (s = active_session_list; s != NULL; s = s->next) { 
-        if (strcmp(s->name, databaseName) == 0) { 
+        if (_tcscmp(s->name, databaseName) == 0) { 
             db = s->db;
             db->accessCount += 1;
             break;
@@ -205,8 +205,8 @@ int dbCLI::create_replication_node(int         nodeId,
         FASTDB_CATCH
     }
     s = sessions.allocate();
-    s->name = new char[strlen(databaseName) + 1];
-    strcpy(s->name, databaseName);
+    s->name = new char_t[_tcslen(databaseName) + 1];
+    _tcscpy(s->name, databaseName);
     s->db = db;
     s->stmts = NULL;
     s->next = active_session_list;
