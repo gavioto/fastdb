@@ -669,6 +669,7 @@ dbXmlScanner::token dbXmlScanner::scan()
             if (!isdigit(ch) && ch != '-' && ch != '+' && ch != '.' && ch != 'E') { 
                 unget(ch);
                 sconst[i] = '\0';
+                slen = i;
                 if (floatingPoint) { 
                    return sscanf(sconst, "%lf%n", &fconst, &pos) == 1 && pos == i
                        ? xml_fconst : xml_error;
