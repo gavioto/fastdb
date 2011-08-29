@@ -573,9 +573,9 @@ void dbFile::unprotect(size_t pos, size_t size)
 inline bool SetFilePosition(HANDLE fh, size_t pos) 
 {
 #ifdef _WIN64
-    DWORD posHigh = (DWORD)(pos >> 32);
+    LONG posHigh = (LONG)(pos >> 32);
     DWORD posLow = SetFilePointer(fh, (LONG)pos, &posHigh, FILE_BEGIN);
-    retrun ((size_t(posHigh) << 32) | posLow) == pos;
+    return ((size_t(posHigh) << 32) | posLow) == pos;
 #else 
     return SetFilePointer(fh, pos, NULL, FILE_BEGIN) == pos; 
 #endif
