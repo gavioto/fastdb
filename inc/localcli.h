@@ -25,7 +25,7 @@ inline int map_type(dbFieldDescriptor* fd) {
            : ((fd->indexType & AUTOINCREMENT) ? cli_autoincrement : fd2cli_type_mapping[fd->type])) 
         : ((fd->type == dbField::tpArray && fd->components->type < dbField::tpArray)
            ? cli_array_of_oid + fd2cli_type_mapping[fd->components->type] 
-           : ((fd->type == dbField::tpRectangle) ? cli_rectangle : cli_unknown));
+           : fd2cli_type_mapping[fd->type]);
 }
 
 
