@@ -269,7 +269,6 @@ int dbSelection::compare(oid_t o1, oid_t o2, dbOrderByNode* order)
 #ifdef USE_HEAP_SORT
 
 #define ELEM(i)   index[(i-1)/quantum]->rows[(i-1)%quantum]
-#define ROW(i)    db->getRow(ELEM(i))
 #define SWAP(i,j) temp = ELEM(i), ELEM(i) = ELEM(j), ELEM(j) = temp
 
 void dbSelection::sort(dbDatabase* db, dbOrderByNode* order)
@@ -287,45 +286,43 @@ void dbSelection::sort(dbDatabase* db, dbOrderByNode* order)
     }
     for (i = n/2, j = i; i >= 1; i--) { 
         k = i;
-        oid_t topId = ELEM(k);
-        dbRecord* top = db->getRow(topId);
+        oid_t top = ELEM(k);
         do { 
-            if (k*2 == n || compare(ROW(k*2), ROW(k*2+1), order) > 0) { 
-                if (compare(top, ROW(k*2), order) >= 0) {
+            if (k*2 == n || compare(ELEM(k*2), ELEM(k*2+1), order) > 0) { 
+                if (compare(top, ELEM(k*2), order) >= 0) {
                     break;
                 }
                 ELEM(k) = ELEM(k*2);
                 k = k*2;
             } else { 
-                if (compare(top, ROW(k*2+1), order) >= 0) {
+                if (compare(top, ELEM(k*2+1), order) >= 0) {
                     break;
                 }
                 ELEM(k) = ELEM(k*2+1);
                 k = k*2+1;
             }
         } while (k <= j);
-        ELEM(k) = topId; 
+        ELEM(k) = top; 
     }
     for (i = n; i >= 2; i--) { 
         SWAP(1, i);
-        oid_t topId = ELEM(1);
-        dbRecord* top = db->getRow(topId);
+        oid_t top = ELEM(1);
         for (k = 1, j = (i-1)/2; k <= j;) { 
-            if (k*2 == i-1 || compare(ROW(k*2), ROW(k*2+1), order) > 0) { 
-                if (compare(top, ROW(k*2), order) >= 0) {
+            if (k*2 == i-1 || compare(ELEM(k*2), ELEM(k*2+1), order) > 0) { 
+                if (compare(top, ELEM(k*2), order) >= 0) {
                     break;
                 }
                 ELEM(k) = ELEM(k*2);
                 k = k*2;
             } else { 
-                if (compare(top, ROW(k*2+1), order) >= 0) {
+                if (compare(top, ELEM(k*2+1), order) >= 0) {
                     break;
                 }
                 ELEM(k) = ELEM(k*2+1);
                 k = k*2+1;
             }
         } 
-        ELEM(k) = topId; 
+        ELEM(k) = top; 
     }
     delete[] index;
 }
