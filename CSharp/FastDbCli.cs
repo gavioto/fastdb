@@ -500,6 +500,7 @@ namespace FastDbNet
      * managed C++ if you want to know the exact syntax.
      */
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal unsafe delegate IntPtr CliColumnSetEx(
       int       var_type, 
       IntPtr    var_ptr,
@@ -510,6 +511,7 @@ namespace FastDbNet
       IntPtr    source_ptr,
       void* buffer);
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal unsafe delegate IntPtr CliColumnGetEx(
       int     var_type, 
       IntPtr  var_ptr,
@@ -944,6 +946,7 @@ namespace FastDbNet
      * Returns:
      *     previous handler
      */
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void CliErrorHandler(int error, 
       [MarshalAs(UnmanagedType.LPStr)] string msg, int msgarg, IntPtr context); 
     
@@ -1061,6 +1064,7 @@ namespace FastDbNet
      * Parameters:
      *     func - pointer to trace function which receives trace message terminated with new line character
      */
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void CliTraceFunction(string msg);
 
     [DllImport(libname,
