@@ -1003,3 +1003,6 @@ that not all fields are described was produced incorrectly)
 --- Release version 3.68 06.09.2011 -------------------------------------
 1. Fix bug in rollback of transaction in delayed commit mode
 2. Fix bug in Win64 support
+
+--- Release version 3.69 ??.10.2011 -------------------------------------
+1. Fix calling convention for delegates in C# CLI
