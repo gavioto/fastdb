@@ -1386,58 +1386,71 @@ void _fastcall dbDatabase::execute(dbExprNode*             expr,
       case dbvmEqArray:
         execute(expr->operand[0], iattr, sattr);
         execute(expr->operand[1], iattr, sattr2);
-        sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&dbArray<char>(sattr.array.base, sattr.array.size), 
-                                                           &dbArray<char>(sattr2.array.base, sattr2.array.size), 
-                                                           0) == 0;
+        {
+            dbArray<char> a1(sattr.array.base, sattr.array.size);
+            dbArray<char> a2(sattr2.array.base, sattr2.array.size);  
+            sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&a1, &a2, 0) == 0;
+        }
         return;
       case dbvmNeArray:
         execute(expr->operand[0], iattr, sattr);
         execute(expr->operand[1], iattr, sattr2);
-        sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&dbArray<char>(sattr.array.base, sattr.array.size), 
-                                                           &dbArray<char>(sattr2.array.base, sattr2.array.size), 
-                                                           0) != 0;
+        {
+            dbArray<char> a1(sattr.array.base, sattr.array.size);
+            dbArray<char> a2(sattr2.array.base, sattr2.array.size);  
+            sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&a1, &a2, 0) != 0;
+        }
         return;
       case dbvmLeArray:
         execute(expr->operand[0], iattr, sattr);
         execute(expr->operand[1], iattr, sattr2);
-        sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&dbArray<char>(sattr.array.base, sattr.array.size), 
-                                                           &dbArray<char>(sattr2.array.base, sattr2.array.size), 
-                                                           0) <= 0;
+        {
+            dbArray<char> a1(sattr.array.base, sattr.array.size);
+            dbArray<char> a2(sattr2.array.base, sattr2.array.size);              
+            sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&a1, &a2, 0) <= 0;
+        }
         return;
       case dbvmLtArray:
         execute(expr->operand[0], iattr, sattr);
         execute(expr->operand[1], iattr, sattr2);
-        sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&dbArray<char>(sattr.array.base, sattr.array.size), 
-                                                           &dbArray<char>(sattr2.array.base, sattr2.array.size), 
-                                                           0) < 0;
+        {
+            dbArray<char> a1(sattr.array.base, sattr.array.size);
+            dbArray<char> a2(sattr2.array.base, sattr2.array.size);              
+            sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&a1, &a2, 0) < 0;
+        }
         return;
       case dbvmGeArray:
         execute(expr->operand[0], iattr, sattr);
         execute(expr->operand[1], iattr, sattr2);
-        sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&dbArray<char>(sattr.array.base, sattr.array.size), 
-                                                           &dbArray<char>(sattr2.array.base, sattr2.array.size), 
-                                                           0) >= 0;
+        {
+            dbArray<char> a1(sattr.array.base, sattr.array.size);
+            dbArray<char> a2(sattr2.array.base, sattr2.array.size);              
+            sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&a1, &a2, 0) >= 0;
+        }
         return;
       case dbvmGtArray:        
         execute(expr->operand[0], iattr, sattr);
         execute(expr->operand[1], iattr, sattr2);
-        sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&dbArray<char>(sattr.array.base, sattr.array.size), 
-                                                           &dbArray<char>(sattr2.array.base, sattr2.array.size), 
-                                                           0) > 0;
+        {
+            dbArray<char> a1(sattr.array.base, sattr.array.size);
+            dbArray<char> a2(sattr2.array.base, sattr2.array.size);              
+            sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&a1, &a2, 0) > 0;
+        }
         return;
       case dbvmBetweenArray:
         execute(expr->operand[0], iattr, sattr);
         execute(expr->operand[1], iattr, sattr2);
-        if ((*(dbUDTComparator)expr->func.fptr)(&dbArray<char>(sattr.array.base, sattr.array.size), 
-                                                &dbArray<char>(sattr2.array.base, sattr2.array.size), 
-                                                0) < 0)
         {
-            sattr.bvalue = false;
-        } else {
-            execute(expr->operand[2], iattr, sattr2);
-            sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&dbArray<char>(sattr.array.base, sattr.array.size), 
-                                                               &dbArray<char>(sattr2.array.base, sattr2.array.size), 
-                                                               0) <= 0;
+            dbArray<char> a1(sattr.array.base, sattr.array.size);
+            dbArray<char> a2(sattr2.array.base, sattr2.array.size);              
+            if ((*(dbUDTComparator)expr->func.fptr)(&a1, &a2, 0) < 0)
+            {
+                sattr.bvalue = false;
+            } else {
+                execute(expr->operand[2], iattr, sattr2);
+                dbArray<char> a3(sattr2.array.base, sattr2.array.size);              
+                sattr.bvalue = (*(dbUDTComparator)expr->func.fptr)(&a1, &a3, 0) <= 0;
+            }
         }
         return;
 

@@ -306,10 +306,16 @@ bool dbTtreeNode::find(dbDatabase* db, dbSearchContext& sc)
     } else if (sc.type == dbField::tpArray) { 
         if (sc.firstKey != NULL) { 
             rec = (char*)db->getRow(item[0]);
-            diff = comparator(sc.firstKey, &dbArray<char>(rec+((dbVarying*)(rec+sc.offs))->offs, ((dbVarying*)(rec+sc.offs))->size), 0);
+            {
+                dbArray<char> a(rec+((dbVarying*)(rec+sc.offs))->offs, ((dbVarying*)(rec+sc.offs))->size);
+                diff = comparator(sc.firstKey, &a, 0);
+            }
             if (diff >= sc.firstKeyInclusion) {     
                 rec = (char*)db->getRow(item[n-1]);
-                diff = comparator(sc.firstKey, &dbArray<char>(rec+((dbVarying*)(rec+sc.offs))->offs, ((dbVarying*)(rec+sc.offs))->size), 0);
+                {
+                    dbArray<char> a(rec+((dbVarying*)(rec+sc.offs))->offs, ((dbVarying*)(rec+sc.offs))->size);                    
+                    diff = comparator(sc.firstKey, &a, 0);
+                }
                 if (diff >= sc.firstKeyInclusion) { 
                     if (right != 0) { 
                         return ((dbTtreeNode*)db->get(right))->find(db, sc); 
@@ -319,7 +325,10 @@ bool dbTtreeNode::find(dbDatabase* db, dbSearchContext& sc)
                 for (l = 0, r = n; l < r;) { 
                     m = (l + r) >> 1;
                     rec = (char*)db->getRow(item[m]);
-                    diff = comparator(sc.firstKey, &dbArray<char>(rec+((dbVarying*)(rec+sc.offs))->offs, ((dbVarying*)(rec+sc.offs))->size), 0);
+                    {
+                        dbArray<char> a(rec+((dbVarying*)(rec+sc.offs))->offs, ((dbVarying*)(rec+sc.offs))->size);
+                        diff = comparator(sc.firstKey, &a, 0);
+                    }
                     if (diff >= sc.firstKeyInclusion) {
                         l = m+1;
                     } else { 
@@ -328,11 +337,11 @@ bool dbTtreeNode::find(dbDatabase* db, dbSearchContext& sc)
                 }
                 while (r < n) { 
                     rec = (char*)db->getRow(item[r]);
-                    if (sc.lastKey != NULL 
-                        && comparator(&dbArray<char>(rec+((dbVarying*)(rec+sc.offs))->offs, ((dbVarying*)(rec+sc.offs))->size), 
-                                         sc.lastKey, 0) >= sc.lastKeyInclusion)
-                    { 
-                        return false;
+                    if (sc.lastKey != NULL) {
+                        dbArray<char> a(rec+((dbVarying*)(rec+sc.offs))->offs, ((dbVarying*)(rec+sc.offs))->size);
+                        if (comparator(&a, sc.lastKey, 0) >= sc.lastKeyInclusion) { 
+                            return false;
+                        }
                     }                        
                     if (!sc.condition 
                         || db->evaluate(sc.condition, item[r], table, sc.cursor)) 
@@ -356,11 +365,11 @@ bool dbTtreeNode::find(dbDatabase* db, dbSearchContext& sc)
         }
         for (l = 0; l < n; l++) { 
             rec = (char*)db->getRow(item[l]);
-            if (sc.lastKey != NULL 
-                && comparator(&dbArray<char>(rec+((dbVarying*)(rec+sc.offs))->offs, ((dbVarying*)(rec+sc.offs))->size), 
-                                 sc.lastKey, 0) >= sc.lastKeyInclusion)
-            {
-                return false;
+            if (sc.lastKey != NULL) { 
+                dbArray<char> a(rec+((dbVarying*)(rec+sc.offs))->offs, ((dbVarying*)(rec+sc.offs))->size);
+                if (comparator(&a, sc.lastKey, 0) >= sc.lastKeyInclusion) {
+                    return false;
+                }
             }
             if (!sc.condition || db->evaluate(sc.condition, item[l], table, sc.cursor)) {
                 if (!sc.cursor->add(item[l])) { 
@@ -461,12 +470,15 @@ bool dbTtreeNode::insert(dbDatabase* db, oid_t& nodeId, oid_t recordId,
     dbTtreeNode* node = (dbTtreeNode*)db->get(nodeId);
     char* rec = (char*)db->getRow(node->item[0]);
     int n = node->nItems;
-    int diff = (type == dbField::tpString || type == dbField::tpWString)
-        ? comparator(key, rec + ((dbVarying*)(rec+offs))->offs, MAX_STRING_LENGTH)
-        : type == dbField::tpArray 
-           ? comparator(key, &dbArray<char>(rec + ((dbVarying*)(rec+offs))->offs, ((dbVarying*)(rec+offs))->size), 0)
-           : comparator(key, rec+offs, sizeofType);
-    
+    int diff;
+    if (type == dbField::tpArray) { 
+        dbArray<char> a(rec + ((dbVarying*)(rec+offs))->offs, ((dbVarying*)(rec+offs))->size);
+        diff = comparator(key, &a, 0);
+    } else {
+        diff = (type == dbField::tpString || type == dbField::tpWString)
+            ? comparator(key, rec + ((dbVarying*)(rec+offs))->offs, MAX_STRING_LENGTH)
+            : comparator(key, rec+offs, sizeofType);
+    }
     if (diff <= 0) { 
         oid_t leftId = node->left;
         if ((leftId == 0 || diff == 0) && node->nItems != pageSize) { 
@@ -522,11 +534,14 @@ bool dbTtreeNode::insert(dbDatabase* db, oid_t& nodeId, oid_t recordId,
         }
     } 
     rec = (char*)db->getRow(node->item[n-1]);
-    diff = (type == dbField::tpString || type == dbField::tpWString)
-        ? comparator(key, rec + ((dbVarying*)(rec+offs))->offs, MAX_STRING_LENGTH)
-        : type == dbField::tpArray 
-           ? comparator(key, &dbArray<char>(rec + ((dbVarying*)(rec+offs))->offs, ((dbVarying*)(rec+offs))->size), 0)
-           : comparator(key, rec+offs, sizeofType);
+    if (type == dbField::tpArray) {
+        dbArray<char> a(rec + ((dbVarying*)(rec+offs))->offs, ((dbVarying*)(rec+offs))->size);
+        diff = comparator(key, &a, 0);
+    } else { 
+        diff = (type == dbField::tpString || type == dbField::tpWString)
+            ? comparator(key, rec + ((dbVarying*)(rec+offs))->offs, MAX_STRING_LENGTH)
+            : comparator(key, rec+offs, sizeofType);
+    }
     if (diff >= 0) { 
         oid_t rightId = node->right;
         if ((rightId == 0 || diff == 0) && node->nItems != pageSize) { 
@@ -599,7 +614,8 @@ bool dbTtreeNode::insert(dbDatabase* db, oid_t& nodeId, oid_t recordId,
         while (l < r)  {
             int i = (l+r) >> 1;
             rec = (char*)db->getRow(node->item[i]);
-            diff = comparator(key, &dbArray<char>(rec + ((dbVarying*)(rec+offs))->offs, ((dbVarying*)(rec+offs))->size), 0);
+            dbArray<char> a(rec + ((dbVarying*)(rec+offs))->offs, ((dbVarying*)(rec+offs))->size);
+            diff = comparator(key, &a, 0);
             if (diff > 0) { 
                 l = i + 1;
             } else { 
@@ -753,11 +769,15 @@ int dbTtreeNode::remove(dbDatabase* db, oid_t& nodeId, oid_t recordId,
     char* rec = (char*)db->getRow(node->item[0]);
     int n = node->nItems;
     dbArray<char> arr;
-    int diff = (type == dbField::tpString || type == dbField::tpWString)
-        ? comparator(key, rec + ((dbVarying*)(rec+offs))->offs, MAX_STRING_LENGTH)
-        : type == dbField::tpArray 
-           ? comparator(key, &dbArray<char>(rec + ((dbVarying*)(rec+offs))->offs, ((dbVarying*)(rec+offs))->size), 0)
-           : comparator(key, rec+offs, sizeofType);
+    int diff;
+    if (type == dbField::tpArray) { 
+        dbArray<char> a(rec + ((dbVarying*)(rec+offs))->offs, ((dbVarying*)(rec+offs))->size);
+        diff = comparator(key, &a, 0);
+    } else {
+        diff = (type == dbField::tpString || type == dbField::tpWString)
+            ? comparator(key, rec + ((dbVarying*)(rec+offs))->offs, MAX_STRING_LENGTH)
+            : comparator(key, rec+offs, sizeofType);
+    }
     if (diff <= 0) { 
         oid_t leftId = node->left;
         if (leftId != 0) { 
@@ -775,11 +795,14 @@ int dbTtreeNode::remove(dbDatabase* db, oid_t& nodeId, oid_t recordId,
         assert (diff == 0);
     }
     rec = (char*)db->getRow(node->item[n-1]);
-    diff = (type == dbField::tpString || type == dbField::tpWString)
-        ? comparator(key, rec + ((dbVarying*)(rec+offs))->offs, MAX_STRING_LENGTH)
-        : type == dbField::tpArray 
-           ? comparator(key, &dbArray<char>(rec + ((dbVarying*)(rec+offs))->offs, ((dbVarying*)(rec+offs))->size), 0)
-           : comparator(key, rec+offs, sizeofType);
+    if (type == dbField::tpArray) {
+        dbArray<char> a(rec + ((dbVarying*)(rec+offs))->offs, ((dbVarying*)(rec+offs))->size);
+        diff = comparator(key, &a, 0);
+    } else {
+        diff = (type == dbField::tpString || type == dbField::tpWString)
+            ? comparator(key, rec + ((dbVarying*)(rec+offs))->offs, MAX_STRING_LENGTH)
+            : comparator(key, rec+offs, sizeofType);
+    }
     if (diff <= 0) {        
         for (int i = 0; i < n; i++) { 
             if (node->item[i] == recordId) { 

@@ -1004,5 +1004,6 @@ that not all fields are described was produced incorrectly)
 1. Fix bug in rollback of transaction in delayed commit mode
 2. Fix bug in Win64 support
 
---- Release version 3.69 ??.10.2011 -------------------------------------
+--- Release version 3.69 24.10.2011 -------------------------------------
 1. Fix calling convention for delegates in C# CLI
+2. Fix problems with GCC 4.6: avoid take address of temporaries

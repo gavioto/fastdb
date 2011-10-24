@@ -247,10 +247,12 @@ int dbSelection::compare(oid_t o1, oid_t o2, dbOrderByNode* order)
                 }
                 break;
               case dbField::tpArray:
-                diff = order->field->_comparator(&dbArray<char>(p + ((dbVarying*)(p + offs))->offs, ((dbVarying*)(p + offs))->size), 
-                                                 &dbArray<char>(q + ((dbVarying*)(q + offs))->offs, ((dbVarying*)(q + offs))->size),
-                                                 0);
-                break;
+              {
+                  dbArray<char> a1(p + ((dbVarying*)(p + offs))->offs, ((dbVarying*)(p + offs))->size);
+                  dbArray<char> a2(q + ((dbVarying*)(q + offs))->offs, ((dbVarying*)(q + offs))->size);                  
+                  diff = order->field->_comparator(&a1, &a2, 0);
+                  break;
+              }
               case dbField::tpRawBinary:
                 diff = order->field->_comparator(p + offs, q + offs, order->field->dbsSize);
                 break;
