@@ -363,8 +363,11 @@ void dbHashTable::find(dbDatabase* db, oid_t hashId, dbSearchContext& sc)
                 equals = sc.field->_comparator(sc.firstKey, rec+((dbVarying*)(rec+sc.offs))->offs, MAX_STRING_LENGTH) == 0;
                 break;
               case dbField::tpArray:
-                equals = sc.field->_comparator(sc.firstKey, &dbArray<byte>(rec+((dbVarying*)(rec+sc.offs))->offs, ((dbVarying*)(rec+sc.offs))->size), sc.field->elemSize) == 0;
-                break;
+              {
+                  dbArray<byte> a(rec+((dbVarying*)(rec+sc.offs))->offs, ((dbVarying*)(rec+sc.offs))->size);
+                  equals = sc.field->_comparator(sc.firstKey, &a, sc.field->elemSize) == 0;
+                  break;
+              }
              default:
                 equals = sc.field->_comparator(sc.firstKey, rec + sc.offs, keylen) == 0; 
             }
