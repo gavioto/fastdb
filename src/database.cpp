@@ -5771,7 +5771,7 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
             }
             objBitSize -= holeBitSize;
             int skip = DOALIGN(objBitSize, dbPageSize/dbAllocationQuantum);
-            pos = ((i-dbBitmapId) << (dbPageBits+dbAllocationQuantumBits+3)) 
+            pos = (offs_t(i-dbBitmapId) << (dbPageBits+dbAllocationQuantumBits+3)) 
                 + (skip << dbAllocationQuantumBits);
             extend(pos + morePages*dbPageSize);
             file.markAsDirty(pos, morePages*dbPageSize);

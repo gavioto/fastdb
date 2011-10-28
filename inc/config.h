@@ -144,7 +144,7 @@
 // 64-bit offsetss are used instead fo 4-byte offsets). Also GigaBASE library compiled with 
 // LARGE_DATABASE_SUPPOR will not be able to work with database created by library
 // built without LARGE_DATABASE_SUPPOR and visa versa. 
-//#define LARGE_DATABASE_SUPPORT 
+#define LARGE_DATABASE_SUPPORT 
 
 // dbDatabaseOidBits number of bits used to represent object identifier. 
 // So the number of objects in database is limited by 2**dbDatabaseOidBits.
