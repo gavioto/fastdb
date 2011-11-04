@@ -1010,4 +1010,4 @@ that not all fields are described was produced incorrectly)
 3. Fix overflow 32-bit overflow bug in memory allocator
 
 --- Release version 3.70 ??.10.2011 -------------------------------------
-1. Optimization of trasnaction start
+1. Eliminate synchronization overhead in beginTransaction for existed transaction
