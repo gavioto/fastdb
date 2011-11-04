@@ -6224,6 +6224,8 @@ bool dbDatabase::beginTransaction(dbLockType lockType)
                 recovery();
             }
 #endif
+        } else if (!delayedCommitForced) {
+            return true;
         }
     } else if (lockType != dbSharedLock) { 
         if (!ctx->writeAccess) { 
@@ -6334,6 +6336,9 @@ bool dbDatabase::beginTransaction(dbLockType lockType)
             if (monitor->ownerPid != ctx->currPid) { 
                 handleError(LockRevoked);
             }
+            if (!delayedCommitForced) {
+                return true;
+            }
         }
     } else { 
         if (!ctx->readAccess && !ctx->writeAccess) { 
@@ -6385,6 +6390,8 @@ bool dbDatabase::beginTransaction(dbLockType lockType)
                 cs.leave();
             }
             ctx->readAccess = true;
+        } else if (!delayedCommitForced) {
+            return true;
         }
     }
     if (lockType != dbCommitLock) { 
