@@ -68,7 +68,7 @@ WEB_EXAMPLES = cgistub bugdb clidb
 CC = g++
 
 # DEFS macro is deprecatred, edit config.h file instead
-DEFS = -Wno-invalid-offsetof
+DEFS = -Wno-invalid-offsetof -Wno-write-strings
 
 ifeq ($(DEBUG), 1)
 CFLAGS = -c -Iinc -Wall -O0 -g -fPIC $(DEFS) $(TFLAGS)

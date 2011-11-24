@@ -1982,6 +1982,8 @@ class FASTDB_DLL_ENTRY dbReplicatedDatabase : public dbDatabase {
               int id, char* servers[], int nServers);
     bool open(OpenParameters& params);
 
+    void stopReplica();
+
     int getNumberOfOnlineNodes();
 
     dbReplicatedDatabase(dbAccessType type = dbAllAccess,

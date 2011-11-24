@@ -2606,17 +2606,17 @@ int dbCLI::prepare_query(int session, char const* query)
             switch (*++p) {
               case 'd':
               case 'i':
-                stmt->query.append(dbQueryElement::qVarInt4, (void*)offs);
+                stmt->query.append(dbQueryElement::qVarInt4, (void*)(size_t)offs);
                 offs += sizeof(cli_int4_t);
                 break;
               case 'f':
                 offs = DOALIGN(offs, sizeof(cli_real8_t));
-                stmt->query.append(dbQueryElement::qVarReal8, (void*)offs);
+                stmt->query.append(dbQueryElement::qVarReal8, (void*)(size_t)offs);
                 offs += sizeof(cli_real8_t);
                 break;
               case 'p':
                 offs = DOALIGN(offs, sizeof(cli_oid_t));
-                stmt->query.append(dbQueryElement::qVarReference, (void*)offs);
+                stmt->query.append(dbQueryElement::qVarReference, (void*)(size_t)offs);
                 offs += sizeof(cli_oid_t);
                 break;                
               case 'l':
@@ -2624,7 +2624,7 @@ int dbCLI::prepare_query(int session, char const* query)
                 p += 1;
                 if (*p == 's') { 
                     offs = DOALIGN(offs, sizeof(wchar_t*));
-                    stmt->query.append(dbQueryElement::qVarWStringPtr, (void*)offs);
+                    stmt->query.append(dbQueryElement::qVarWStringPtr, (void*)(size_t)offs);
                     offs += sizeof(wchar_t*);
                 } else { 
                     if (*p != 'd' && *p != 'i') {
@@ -2632,23 +2632,23 @@ int dbCLI::prepare_query(int session, char const* query)
                         return cli_bad_statement;
                     }
                     offs = DOALIGN(offs, sizeof(cli_int8_t));
-                    stmt->query.append(dbQueryElement::qVarInt8, (void*)offs);
+                    stmt->query.append(dbQueryElement::qVarInt8, (void*)(size_t)offs);
                     offs += sizeof(cli_int8_t);
                 }
                 break;
               case 's':
                 offs = DOALIGN(offs, sizeof(char*));
-                stmt->query.append(dbQueryElement::qVarStringPtr, (void*)offs);
+                stmt->query.append(dbQueryElement::qVarStringPtr, (void*)(size_t)offs);
                 offs += sizeof(char*);
                 break;
               case 'R':
                 offs = DOALIGN(offs, sizeof(cli_coord_t));
-                stmt->query.append(dbQueryElement::qVarRectangle, (void*)offs);
+                stmt->query.append(dbQueryElement::qVarRectangle, (void*)(size_t)offs);
                 offs += sizeof(cli_rectangle_t);
                 break;
               case 't':
                 stmt->query.append((sizeof(cli_time_t) == 4) ? dbQueryElement::qVarInt4 : dbQueryElement::qVarInt8, 
-                                   (void*)offs);
+                                   (void*)(size_t)offs);
                 offs += sizeof(cli_time_t);
                 break;
               default:

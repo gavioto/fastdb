@@ -91,7 +91,7 @@ void dbSelection::truncate(cardinality_t from, cardinality_t length)
             if (n > length) { 
                 n = length;
             }
-            if (dst->nRows == pos) { 
+            if (size_t(dst->nRows) == pos) { 
                 dst = dst->next;
                 pos = 0;
             }
