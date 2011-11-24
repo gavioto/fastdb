@@ -1009,5 +1009,5 @@ that not all fields are described was produced incorrectly)
 2. Fix problems with GCC 4.6: avoid take address of temporaries
 3. Fix overflow 32-bit overflow bug in memory allocator
 
---- Release version 3.70 ??.10.2011 -------------------------------------
+--- Release version 3.70 10.11.2011 -------------------------------------
 1. Eliminate synchronization overhead in beginTransaction for existed transaction
