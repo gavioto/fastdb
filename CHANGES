@@ -1011,3 +1011,6 @@ that not all fields are described was produced incorrectly)
 
 --- Release version 3.70 10.11.2011 -------------------------------------
 1. Eliminate synchronization overhead in beginTransaction for existed transaction
+
+--- Release version 3.71 10.11.2011 -------------------------------------
+1. Add dbReplicatedDatabase::stopReplica method

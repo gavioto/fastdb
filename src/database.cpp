@@ -8010,6 +8010,12 @@ void dbReplicatedDatabase::changeActiveNode()
     }
 }
     
+void dbReplicatedDatabase::stopReplica()
+{
+    dbCriticalSection cs(startCS);
+    opened = false;
+    startEvent.signal();
+}
 
 void dbReplicatedDatabase::reader()
 {
