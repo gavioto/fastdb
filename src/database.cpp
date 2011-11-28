@@ -7917,7 +7917,7 @@ bool dbReplicatedDatabase::open(char_t const* dbName, char_t const* fiName,
     readerThread.join();
     delete[] con; 
     delete acceptSock;
-    close0();
+    dbDatabase::close0();
     return false;
 }       
 
