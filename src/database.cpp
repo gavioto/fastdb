@@ -2352,15 +2352,17 @@ void dbDatabase::cleanup(dbInitializationMutex::initializationStatus status, int
         }
         // no break
       case 7:
+        cs.close();
+        // no break
+      case 6:
         if (delayedCommitEventsOpened) { 
             delayedCommitStopTimerEvent.close();
             delayedCommitStartTimerEvent.close();
             commitThreadSyncEvent.close();
             delayedCommitEventsOpened = false;
         }
-        // no break
-      case 6:
-        cs.close();
+        backupInitEvent.close();
+        delete threadContext.get();    
         // no break
       case 5:
         backupCompletedEvent.close();
@@ -7497,13 +7499,13 @@ bool dbReplicatedDatabase::open(char_t const* dbName, char_t const* fiName,
     _stprintf(name, _T("%s.cs"), dbName);
     if (!cs.create(name, &monitor->sem)) { 
         handleError(DatabaseOpenError, "Failed to initialize database monitor");
-        cleanup(status, 5);
+        cleanup(status, 6);
         return false;
     }
     if (accessType == dbConcurrentUpdate || accessType == dbConcurrentRead) { 
         _stprintf(name, _T("%s.mcs"), dbName);
         if (!mutatorCS.create(name, &monitor->mutatorSem)) { 
-            cleanup(status, 6);
+            cleanup(status, 7);
             handleError(DatabaseOpenError,
                         "Failed to initialize database monitor");
             return false;
