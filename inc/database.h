@@ -1186,6 +1186,10 @@ class FASTDB_DLL_ENTRY dbDatabase
         offs_t      pos;
         size_t      size;
         dbLocation* next;
+        dbDatabase* db;
+
+        dbLocation(dbDatabase* db, offs_t pos, size_t size);
+        ~dbLocation();
     };
     dbLocation* reservedChain;
     
@@ -1828,22 +1832,6 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @return true id location was reserved
      */
     bool wasReserved(offs_t pos, size_t size);
-
-    /**
-     * Mark location as reserved. This method is used by allocator to protect hole
-     * located in memory allocation bitmap, from been used by recursuve call of allocator (needed to clone
-     * bitmap pages).
-     * @param location [out] local structure describing location.
-     * @param pos start position of the location
-     * @param size location size
-     */
-    void reserveLocation(dbLocation& location, offs_t pos, size_t size);
-
-    /**
-     * Remove location from list of reserved locations. It is done after location is marked
-     * as occupied in bitmap.
-     */
-    void commitLocation();
 
     /**
      * Find table using symbol name
