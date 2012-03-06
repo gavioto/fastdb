@@ -5354,17 +5354,16 @@ inline bool dbDatabase::wasReserved(offs_t pos, size_t size)
     return false;
 }
 
-inline void dbDatabase::reserveLocation(dbLocation& location, offs_t pos, size_t size)
+inline dbDatabase::dbLocation::dbLocation(dbDatabase* dbs, offs_t locPos, size_t locSize)
+  : pos(locPos), size(locSize), next(db->reservedChain), db(dbs)
 {
-    location.pos = pos;
-    location.size = size;
-    location.next = reservedChain;
-    reservedChain = &location;
+    db->reservedChain = this;
 }
 
-inline void dbDatabase::commitLocation()
+inline dbDatabase::dbLocation::~dbLocation()
 {
-    reservedChain = reservedChain->next;
+    assert(db->reservedChain == this);
+    db->reservedChain = next;
 }
 
 inline int ilog2(offs_t val) 
@@ -5555,7 +5554,6 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
     const int  pageBits = dbPageSize*8;
     int        holeBeforeFreePage  = 0;
     oid_t      freeBitmapPage = 0;
-    dbLocation location;
 
     lastPage = dbBitmapId + dbBitmapPages;
     allocatedSize += (offs_t)size;
@@ -5572,15 +5570,16 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
         fixedSizeAllocator.retries = retries;
 
         if (pos != 0) { 
-            reserveLocation(location, pos, size);
-            if (oid != 0) {
-                offs_t prev = currIndex[oid];
-                memcpy(baseAddr+pos, 
+            {
+                dbLocation location(this, pos, size);
+                if (oid != 0) {
+                    offs_t prev = currIndex[oid];
+                    memcpy(baseAddr+pos, 
                        baseAddr+(prev&~dbInternalObjectMarker), size);
-                currIndex[oid] = (prev & dbInternalObjectMarker) + pos;
+                    currIndex[oid] = (prev & dbInternalObjectMarker) + pos;
+                }
+                markAsAllocated(pos, objBitSize);
             }
-            markAsAllocated(pos, objBitSize);
-            commitLocation();
             file.markAsDirty(pos, size);
             return pos;
         }
@@ -5616,31 +5615,32 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
                             continue;
                         }       
                         extend(pos + (offs_t)size);
-                        reserveLocation(location, pos, size);
-                        currPBitmapPage = i;
-                        currPBitmapOffs = offs;
-                        if (oid != 0) {
-                            offs_t prev = currIndex[oid];
-                            memcpy(baseAddr+pos, 
+                        {
+                            dbLocation location(this, pos, size);
+                            currPBitmapPage = i;
+                            currPBitmapOffs = offs;
+                            if (oid != 0) {
+                                offs_t prev = currIndex[oid];
+                                memcpy(baseAddr+pos, 
                                    baseAddr+(prev&~dbInternalObjectMarker), size);
-                            currIndex[oid] = (prev & dbInternalObjectMarker) + pos;
+                                currIndex[oid] = (prev & dbInternalObjectMarker) + pos;
+                            }
+                            begin = put(i);
+                            size_t holeBytes = holeBitSize >> 3;
+                            if (holeBytes > offs) {
+                                memset(begin, 0xFF, offs);
+                                holeBytes -= offs;
+                                begin = put(--i);
+                                offs = dbPageSize;
+                            }
+                            while (holeBytes > dbPageSize) {
+                                memset(begin, 0xFF, dbPageSize);
+                                holeBytes -= dbPageSize;
+                                bitmapPageAvailableSpace[i] = 0;
+                                begin = put(--i);
+                            }
+                            memset(&begin[offs-holeBytes], 0xFF, holeBytes);
                         }
-                        begin = put(i);
-                        size_t holeBytes = holeBitSize >> 3;
-                        if (holeBytes > offs) {
-                            memset(begin, 0xFF, offs);
-                            holeBytes -= offs;
-                            begin = put(--i);
-                            offs = dbPageSize;
-                        }
-                        while (holeBytes > dbPageSize) {
-                            memset(begin, 0xFF, dbPageSize);
-                            holeBytes -= dbPageSize;
-                            bitmapPageAvailableSpace[i] = 0;
-                            begin = put(--i);
-                        }
-                        memset(&begin[offs-holeBytes], 0xFF, holeBytes);
-                        commitLocation();
                         file.markAsDirty(pos, size);
                         return pos;
                     }
@@ -5675,36 +5675,37 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
                             continue;
                         }       
                         extend(pos + (offs_t)size);
-                        reserveLocation(location, pos, size);
-                        currRBitmapPage = i;
-                        currRBitmapOffs = offs;
-                        if (oid != 0) { 
-                            offs_t prev = currIndex[oid];
-                            memcpy(baseAddr+pos, 
-                                   baseAddr+(prev&~dbInternalObjectMarker), size);
-                            currIndex[oid] = (prev & dbInternalObjectMarker) + pos;
+                        {
+                            dbLocation location(this, pos, size);
+                            currRBitmapPage = i;
+                            currRBitmapOffs = offs;
+                            if (oid != 0) { 
+                                offs_t prev = currIndex[oid];
+                                memcpy(baseAddr+pos, 
+                                       baseAddr+(prev&~dbInternalObjectMarker), size);
+                                currIndex[oid] = (prev & dbInternalObjectMarker) + pos;
+                            }
+                            begin = put(i);
+                            begin[offs] |= (1 << (objBitSize - holeBitSize)) - 1; 
+                            if (holeBitSize != 0) { 
+                                if (size_t(holeBitSize) > offs*8) { 
+                                    memset(begin, 0xFF, offs);
+                                    holeBitSize -= (int)offs*8;
+                                    begin = put(--i);
+                                    offs = dbPageSize;
+                                }
+                                while (holeBitSize > pageBits) { 
+                                    memset(begin, 0xFF, dbPageSize);
+                                    holeBitSize -= pageBits;
+                                    bitmapPageAvailableSpace[i] = 0;
+                                    begin = put(--i);
+                                }
+                                while ((holeBitSize -= 8) > 0) { 
+                                    begin[--offs] = 0xFF; 
+                                }
+                                begin[offs-1] |= ~((1 << -holeBitSize) - 1);
+                            }
                         }
-                        begin = put(i);
-                        begin[offs] |= (1 << (objBitSize - holeBitSize)) - 1; 
-                        if (holeBitSize != 0) { 
-                            if (size_t(holeBitSize) > offs*8) { 
-                                memset(begin, 0xFF, offs);
-                                holeBitSize -= (int)offs*8;
-                                begin = put(--i);
-                                offs = dbPageSize;
-                            }
-                            while (holeBitSize > pageBits) { 
-                                memset(begin, 0xFF, dbPageSize);
-                                holeBitSize -= pageBits;
-                                bitmapPageAvailableSpace[i] = 0;
-                                begin = put(--i);
-                            }
-                            while ((holeBitSize -= 8) > 0) { 
-                                begin[--offs] = 0xFF; 
-                            }
-                            begin[offs-1] |= ~((1 << -holeBitSize) - 1);
-                        }
-                        commitLocation();
                         file.markAsDirty(pos, size);
                         return pos;
                     } else if (maxHoleSize[mask] >= objBitSize) { 
@@ -5717,18 +5718,19 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
                             continue;
                         }       
                         extend(pos + (offs_t)size);
-                        reserveLocation(location, pos, size);
-                        currRBitmapPage = i;
-                        currRBitmapOffs = offs;
-                        if (oid != 0) { 
-                            offs_t prev = currIndex[oid];
-                            memcpy(baseAddr+pos, 
-                                   baseAddr+(prev&~dbInternalObjectMarker), size);
-                            currIndex[oid] = (prev & dbInternalObjectMarker) + pos;
+                        {
+                            dbLocation location(this, pos, size);
+                            currRBitmapPage = i;
+                            currRBitmapOffs = offs;
+                            if (oid != 0) { 
+                                offs_t prev = currIndex[oid];
+                                memcpy(baseAddr+pos, 
+                                       baseAddr+(prev&~dbInternalObjectMarker), size);
+                                currIndex[oid] = (prev & dbInternalObjectMarker) + pos;
+                            }
+                            begin = put(i);
+                            begin[offs] |= ((1 << objBitSize) - 1) << holeBitOffset;
                         }
-                        begin = put(i);
-                        begin[offs] |= ((1 << objBitSize) - 1) << holeBitOffset;
-                        commitLocation();
                         file.markAsDirty(pos, size);
                         return pos;
                     }
@@ -5813,7 +5815,7 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
             }
 
             if (holeBitSize != 0) { 
-                reserveLocation(location, pos, size);
+                dbLocation location(this, pos, size);
                 while (holeBitSize > pageBits) { 
                     holeBitSize -= pageBits;
                     memset(put(--i), 0xFF, dbPageSize);
@@ -5824,7 +5826,6 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
                     *--cur = 0xFF; 
                 }
                 *(cur-1) |= ~((1 << -holeBitSize) - 1);
-                commitLocation();
             }
             file.markAsDirty(pos, size);
             return pos;
