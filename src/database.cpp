@@ -5355,7 +5355,7 @@ inline bool dbDatabase::wasReserved(offs_t pos, size_t size)
 }
 
 inline dbDatabase::dbLocation::dbLocation(dbDatabase* dbs, offs_t locPos, size_t locSize)
-  : pos(locPos), size(locSize), next(db->reservedChain), db(dbs)
+  : pos(locPos), size(locSize), next(dbs->reservedChain), db(dbs)
 {
     db->reservedChain = this;
 }
