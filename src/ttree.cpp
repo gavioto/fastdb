@@ -807,13 +807,14 @@ int dbTtreeNode::remove(dbDatabase* db, oid_t& nodeId, oid_t recordId,
         for (int i = 0; i < n; i++) { 
             if (node->item[i] == recordId) { 
                 if (n == 1) { 
+                    oid_t delId = nodeId;                    
                     if (node->right == 0) { 
-                        db->freeObject(nodeId);
                         nodeId = node->left;
+                        db->freeObject(delId);
                         return 1;
                     } else if (node->left == 0) { 
-                        db->freeObject(nodeId);
                         nodeId = node->right;
+                        db->freeObject(delId);
                         return 1;
                     } 
                 } 
