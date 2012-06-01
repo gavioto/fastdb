@@ -518,7 +518,7 @@ AC_ARG_ENABLE(
 case ${want_posix_sem} in
 yes)
    AC_MSG_RESULT(yes)
-   AC_DEFINE([USE_POSIX_SEMPAHORES], [1], [define to use POSIX sempahores instead of SysV ones])
+   AC_DEFINE([USE_POSIX_SEMAPHORES], [1], [define to use POSIX sempahores instead of SysV ones])
    ;;
 no)
    AC_MSG_RESULT(no)
