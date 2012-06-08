@@ -890,6 +890,37 @@ class dbGlobalCriticalSection {
         assert(rc == 0);
 #endif
     }
+    
+#ifdef __APPLE__ // MacOS doesn't support sem_init
+    char* sem_name;
+
+    bool open(char const* name, sharedsem_t* shr) { 
+        delete[] sem_name;
+        sem_name = new char[strlen(name)+1];
+        strcpy(sem_name, name);
+        sem = sem_open(name, 0);
+        return sem != SEM_FAILED;
+    }
+
+    bool create(char const* name, sharedsem_t* shr) {   
+        delete[] sem_name;
+        sem_name = new char[strlen(name)+1];
+        strcpy(sem_name, name);
+        sem = sem_open(name, O_CREAT|O_EXCL, 0777, 0);
+        return sem != SEM_FAILED && sem_post(sem) == 0;
+    }
+
+    void erase() { 
+        sem_unlink(sem_name);
+    }
+    
+    dbGlobalCriticalSection() : sem_name(NULL) {
+    }
+
+    ~dbGlobalCriticalSection() { 
+        delete[] sem_name;
+    }
+#else
     bool open(char const* name, sharedsem_t* shr) { 
         sem = shr;
         return true;
@@ -899,11 +930,13 @@ class dbGlobalCriticalSection {
         sem = shr;
         return sem_init(sem, 1, 1) == 0;
     }
-
-    void close() {}
     void erase() { 
         sem_destroy(sem);
     }
+#endif
+
+
+    void close() {}
 };
 
 #else
