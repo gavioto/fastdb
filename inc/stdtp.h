@@ -131,11 +131,6 @@ typedef char char_t;
 #define _WIN32
 #endif
 
-#if defined(__APPLE__) && !defined(__FreeBSD__)
-// MAC OS X is Free BSD
-#define __FreeBSD__ 4
-#endif
-
 #ifndef CLI_CALLBACK_CC /* CLI callbacks calling convention */
 #define CLI_CALLBACK_CC
 #endif

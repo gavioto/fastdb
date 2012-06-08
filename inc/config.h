@@ -102,7 +102,7 @@
 #endif // VXWORKS
 //USE_POSIX_SEMAPHORES use POSIX sem_* sempahores instead of SysV semaphores
 //     instead of SysV semaphores and shared memory
-//#define USE_POSIX_SEMAPHORES 1
+#define USE_POSIX_SEMAPHORES 1
 
 
 //USE_POSIX_MMAP - if 1 then use Posix mmap for mapping database file and monitor, 
