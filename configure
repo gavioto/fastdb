@@ -24339,7 +24339,7 @@ $as_echo "yes" >&6; }
 no)
    { $as_echo "$as_me:$LINENO: result: no" >&5
 $as_echo "no" >&6; }
-   CFLAGS="${CFLAGS} -DNDEBUG -O2 -fno-strict-aliasing"
+   CFLAGS="${CFLAGS} -DNDEBUG -O3 -fno-strict-aliasing"
 
 cat >>confdefs.h <<\_ACEOF
 #define HANDLE_ASSERTION_FAILURES 1
