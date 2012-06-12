@@ -205,12 +205,12 @@
 
 // Use reentrant version of localtime
 #if !defined(__APPLE__) && !defined(_WIN32) && !defined(VXWORKS)
-#define HAVE_LOCALTIME_R
+#define HAVE_LOCALTIME_R 1
 #endif
 
 // Use reentrant version of localtime
 #if !defined(__APPLE__) && !defined(_WIN32) && !defined(_AIX) && !defined(HAVE_GETHOSTBYNAME_R) && !defined(__NetBSD__) && !defined(VXWORKS)
-#define HAVE_GETHOSTBYNAME_R
+#define HAVE_GETHOSTBYNAME_R 1
 #endif
 
 // Protect replica from unintended access (data corruption)

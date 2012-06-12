@@ -723,9 +723,8 @@ inline void searchArrayOfString(dbSynthesizedAttribute& sattr,
     dbVarying *p = (dbVarying*)sattr2.array.base;
     int        n = sattr2.array.size;
     char*      str = sattr.array.base;
-    char*      base = (char*)sattr2.base; 
     while (--n >= 0) { 
-        if (strcmp(base + p->offs, str) == 0) { 
+        if (strcmp((char*)p + p->offs, str) == 0) { 
             sattr.bvalue = true;
             return;
         }
@@ -775,9 +774,8 @@ inline void searchArrayOfWString(dbSynthesizedAttribute& sattr,
     dbVarying *p = (dbVarying*)sattr2.array.base;
     int        n = sattr2.array.size;
     wchar_t*   str = (wchar_t*)sattr.array.base;
-    char*      base = (char*)sattr2.base; 
     while (--n >= 0) { 
-        if (wcscmp((wchar_t*)(base + p->offs), str) == 0) { 
+        if (wcscmp((wchar_t*)((char*)p + p->offs), str) == 0) { 
             sattr.bvalue = true;
             return;
         }
