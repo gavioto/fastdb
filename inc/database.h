@@ -131,7 +131,12 @@ class dbHeader {
         MODE_OID_64        = 0x01,
         MODE_OFFS_64       = 0x02,
         MODE_AUTOINCREMENT = 0x04,
-        MODE_RECTANGLE_DIM = 0x08
+        MODE_RECTANGLE_DIM = 0x08,
+        MODE_NO_PTHREADS   = 0x10,
+        MODE_REPLICTION    = 0x20,
+        MODE_DO_NOT_REUSE_OID = 0x40,
+        MODE_ALIGN_HEADER  = 0x80,
+        MODE_PAD_HEADER    = 0x100
     };    
 
     int getVersion() { 
@@ -1087,16 +1092,6 @@ class FASTDB_DLL_ENTRY dbDatabase
      */
     void recoverFreeOidList();
 
-    enum dbThreadMode {
-        dbNotUsePthreads,
-        dbUsePthreads
-    };
-
-    enum dbReplicationMode {
-        dbReplicated,
-        dbStandalone
-    };
-       
     /**
      * Database constructor
      * @param type access type: <code>dbDatabase::dbReadOnly</code> or <code>dbDatabase::dbAllAcces</code>
@@ -1112,16 +1107,34 @@ class FASTDB_DLL_ENTRY dbDatabase
                size_t dbInitSize = dbDefaultInitDatabaseSize,
                size_t dbExtensionQuantum = dbDefaultExtensionQuantum,
                size_t dbInitIndexSize = dbDefaultInitIndexSize,
-               int nThreads = 1 
+               int nThreads = 1,
                // Do not specify the following parameter - them are used only for checking
                // that application and FastDB library were built with the 
-               // same compiler options (-DNO_PTHREADS and -REPPLICATION_SUPPORT)
-               // Mismached parameters should cause linker error
+               // same compiler options.
+               int mode = 0
 #ifdef NO_PTHREADS
-               , dbThreadMode threadMode = dbNotUsePthreads
+               | dbHeader::MODE_NO_PTHREADS
 #endif
 #ifdef REPLICATION_SUPPORT
-               , dbReplicationMode replicationMode = dbReplicated
+               | dbHeader::MODE_REPLICATION
+#endif
+#ifdef ALIGN_HEADER      
+               | dbHeader::MODE_ALIGN_HEADER
+#endif        
+#ifdef PAD_HEADER      
+               | dbHeader::MODE_PAD_HEADER
+#endif        
+#if dbDatabaseOffsetBits > 32
+               | dbHeader::MODE_OFFS_64
+#endif        
+#if dbDatabaseOidBits > 32
+               | dbHeader::MODE_OID_64
+#endif        
+#ifdef AUTOINCREMENT_SUPPORT    
+               | dbHeader::MODE_AUTOINCREMENT
+#endif
+#ifdef DO_NOT_REUSE_OID_WITHIN_SESSION
+               | dbHeader::MODE_DO_NOT_REUSE_OID
 #endif
                );
     /** 
