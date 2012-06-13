@@ -7231,20 +7231,45 @@ bool dbDatabase::backup(dbFile* f, bool compactify)
 
 dbDatabase::dbDatabase(dbAccessType type, size_t dbInitSize, 
                        size_t dbExtensionQuantum, size_t dbInitIndexSize,
-                       int nThreads
-#ifdef NO_PTHREADS
-                       , dbThreadMode threadMode
-#endif
-#ifdef REPLICATION_SUPPORT
-                       , dbReplicationMode replicationMode
-#endif
-) : accessType(type), 
+                       int nThreads,
+                       int appMode)
+: accessType(type), 
     initSize(dbInitSize), 
     extensionQuantum(dbExtensionQuantum),
     initIndexSize(dbInitIndexSize),
     freeSpaceReuseThreshold((offs_t)dbExtensionQuantum),
     parallelScanThreshold(dbDefaultParallelScanThreshold)
 {
+    int libMode = 0
+#ifdef NO_PTHREADS
+               | dbHeader::MODE_NO_PTHREADS
+#endif
+#ifdef REPLICATION_SUPPORT
+               | dbHeader::MODE_REPLICATION
+#endif
+#ifdef ALIGN_HEADER      
+               | dbHeader::MODE_ALIGN_HEADER
+#endif        
+#ifdef PAD_HEADER      
+               | dbHeader::MODE_PAD_HEADER
+#endif        
+#if dbDatabaseOffsetBits > 32
+               | dbHeader::MODE_OFFS_64
+#endif        
+#if dbDatabaseOidBits > 32
+               | dbHeader::MODE_OID_64
+#endif        
+#ifdef AUTOINCREMENT_SUPPORT    
+               | dbHeader::MODE_AUTOINCREMENT
+#endif
+#ifdef DO_NOT_REUSE_OID_WITHIN_SESSION
+               | dbHeader::MODE_DO_NOT_REUSE_OID
+#endif
+                     ;
+    if (appMode != libMode) {
+        fprintf(stderr, "Incompatibly between headers and library: %x vs. %x\n", appMode, libMode);
+        exit(1);
+    }
 #ifdef AUTO_DETECT_PROCESS_CRASH
     FASTDB_ASSERT(type != dbConcurrentUpdate);
 #endif
