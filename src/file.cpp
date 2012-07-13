@@ -1277,10 +1277,10 @@ int dbFile::open(char const* name, char const*, int flags, size_t initSize, bool
         int open_flags = ((flags & read_only) ? O_RDONLY : O_RDWR/*|O_DSYNC*/|O_CREAT) 
             | ((flags & truncate) ? O_TRUNC : 0)
             | ((flags & (no_buffering|write_through)) ? O_DIRECT : 0);
+        struct stat statBuf;
 #ifdef VXWORKS
         // Check if the file exists
         bool bFileExists = true;
-        struct stat statBuf;
         if (::stat(name, &statBuf) != OK)
         {
             if (errno == ENOENT || errno == ENOTDIR || errno == ENAMETOOLONG || errno == ENODEV) {
@@ -1312,15 +1312,17 @@ int dbFile::open(char const* name, char const*, int flags, size_t initSize, bool
             directio(fd, DIRECTIO_ON);
         }
 #endif
-        mmapSize = lseek(fd, 0, SEEK_END); 
-        if ((flags & read_only) == 0 && mmapSize == 0) { 
-            mmapSize = initSize;
-            if (ftruncate(fd, mmapSize) != ok) {
-                status = errno;
-                if (fd >= 0) { 
-                    ::close(fd);
+        if (::fstat(fd, &statBuf) != 0 || (statBuf.st_mode & S_IFREG)) {         
+            mmapSize = lseek(fd, 0, SEEK_END); 
+            if ((flags & read_only) == 0 && mmapSize == 0) { 
+                mmapSize = initSize;
+                if (ftruncate(fd, mmapSize) != ok) {
+                    status = errno;
+                    if (fd >= 0) { 
+                        ::close(fd);
+                    }
+                    return status;
                 }
-                return status;
             }
         }
     }
