@@ -1324,6 +1324,8 @@ int dbFile::open(char const* name, char const*, int flags, size_t initSize, bool
                     return status;
                 }
             }
+        } else { 
+            mmapSize = initSize;
         }
     }
 #endif // DISKLESS_CONFIGURATION
