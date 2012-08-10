@@ -437,7 +437,8 @@ namespace FastDbNet
 
       sessionThreadID = System.Threading.Thread.CurrentThread.GetHashCode();
       IntPtr dummy    = IntPtr.Zero;
-      CLI.cli_set_error_handler(session, new CLI.CliErrorHandler(SessionErrorHandler), dummy);
+      errorHandler = new CLI.CliErrorHandler(SessionErrorHandler);
+      CLI.cli_set_error_handler(session, errorHandler, dummy);
     }
 
     private string    dbName;
@@ -453,6 +454,7 @@ namespace FastDbNet
     private int       maxConnectRetries  = 0;
     private int       reconnectTimeout   = DefReconnectTimeoutSec;
     private bool      enableReplication  = false;
+    private CLI.CliErrorHandler errorHandler;
 
     private int       nodeID             = 0;
     private string[]  nodeNames          = new string[] {};
