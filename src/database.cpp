@@ -7344,6 +7344,17 @@ dbTableDescriptor* dbDatabase::loadMetaTable()
 
 #ifdef REPLICATION_SUPPORT
 
+dbConnection::~dbConnection() 
+{ 
+    readyEvent.close();
+    useEvent.close();
+    statusEvent.close();
+    committedEvent.close();
+    delete reqSock;
+    delete respSock;
+}
+
+
 #define MAX_LOST_TRANSACTIONS 100
 
 char const* statusText[] = {

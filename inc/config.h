@@ -38,7 +38,7 @@
 //#define FASTDB_DEBUG DEBUG_TRACE_ALL
 
 // USE_NAMESPACES - place FastDB classes in separate namespace  
-//#define USE_NAMESPACES 1
+#define USE_NAMESPACES 1
 
 // SECURE_SERVER - enable authentication for remote logins: keep user/password table, 
 //   check password for remote logins
@@ -111,7 +111,7 @@
 //#define USE_POSIX_MMAP 0
 
 //REPLICATION_SUPPORT - fault tolerant version of FastDB
-//#define REPLICATION_SUPPORT 1
+#define REPLICATION_SUPPORT 1
 
 #ifdef VXWORKS
 #define NO_MMAP 1
