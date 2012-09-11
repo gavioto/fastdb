@@ -14,6 +14,9 @@
 #include "class.h"
 #include "reference.h"
 #include "file.h"
+#ifdef REPLICATION_SUPPORT
+#include "sockio.h"
+#endif
 
 BEGIN_FASTDB_NAMESPACE
 
@@ -1882,8 +1885,6 @@ class FASTDB_DLL_ENTRY dbDatabase
 
 
 #ifdef REPLICATION_SUPPORT
-
-#include "sockio.h"
 
 class FASTDB_DLL_ENTRY dbConnection { 
  public:
