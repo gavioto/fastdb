@@ -136,7 +136,8 @@ class dbHeader {
         MODE_REPLICTION    = 0x20,
         MODE_DO_NOT_REUSE_OID = 0x40,
         MODE_ALIGN_HEADER  = 0x80,
-        MODE_PAD_HEADER    = 0x100
+        MODE_PAD_HEADER    = 0x100,
+        MODE_REPLICATION   = 0x200
     };    
 
     int getVersion() { 
@@ -1912,14 +1913,7 @@ class FASTDB_DLL_ENTRY dbConnection {
         reqSock = respSock = NULL;
         nRecoveredPages = 0;
     }
-    ~dbConnection() { 
-        readyEvent.close();
-        useEvent.close();
-        statusEvent.close();
-        committedEvent.close();
-        delete reqSock;
-        delete respSock;
-    }
+    ~dbConnection();
 }; 
 
 class FASTDB_DLL_ENTRY dbReplicatedDatabase : public dbDatabase {
