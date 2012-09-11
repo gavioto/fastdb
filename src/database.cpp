@@ -19,9 +19,6 @@
 #include <ctype.h>
 #include <wctype.h>
 #include <math.h>
-#ifndef _WINCE
-#include <sys/stat.h>
-#endif
 
 #ifdef VXWORKS
 #include "fastdbShim.h"

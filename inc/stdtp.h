@@ -60,6 +60,10 @@ typedef char char_t;
 #define __FreeBSD__ 5
 #endif
 
+#ifndef _WINCE
+#include <sys/stat.h>
+#endif
+
 #ifdef _WIN32
 
 #ifdef USE_MFC
@@ -205,7 +209,7 @@ extern FASTDB_DLL_ENTRY void dbTrace(char* message, ...);
 		#define _tfopen _wfopen
 	#endif
 
-	typedef struct _stat STATSTRUCT;
+    typedef struct ::_stat STATSTRUCT;
 
 	#define CNV_BUF_SIZE 256
 	inline wchar_t* convertStringToUnicode(wchar_t* dst, char const* src, size_t size) { mbstowcs(dst, src, size); return dst; }
@@ -229,7 +233,7 @@ extern FASTDB_DLL_ENTRY void dbTrace(char* message, ...);
 		#define _tfopen fopen
 	#endif
 
-	typedef struct stat STATSTRUCT;
+    typedef struct ::stat STATSTRUCT;
 
 	#define WC_STRING(s) s
 
