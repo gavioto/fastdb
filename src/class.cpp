@@ -168,7 +168,7 @@ dbFieldDescriptor* dbFieldDescriptor::setStringType(int appType)
     components = new dbFieldDescriptor("[]");
     components->type = components->appType = dbField::tpInt1;
     components->dbsSize = components->appSize = components->alignment = 1; 
-    _comparator = (dbUDTComparator)((indexType & CASE_INSENSITIVE) ? stringIgnoreCaseComparator : stringComparator);
+    _comparator = ((indexType & CASE_INSENSITIVE) ? (dbUDTComparator)stringIgnoreCaseComparator : (dbUDTComparator)stringComparator);
     return this;
 }
 
@@ -186,7 +186,7 @@ dbFieldDescriptor* dbFieldDescriptor::setWStringType(int appType)
         components->type = components->appType = dbField::tpInt4;
         components->dbsSize = components->appSize = components->alignment = 4; 
     }
-    _comparator = (dbUDTComparator)((indexType & CASE_INSENSITIVE) ? wstringIgnoreCaseComparator : wstringComparator);
+    _comparator = ((indexType & CASE_INSENSITIVE) ? (dbUDTComparator)wstringIgnoreCaseComparator : (dbUDTComparator)wstringComparator);
     return this;
 }
 

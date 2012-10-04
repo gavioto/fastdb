@@ -402,7 +402,7 @@ static void exportRecord(dbFieldDescriptor* fieldList, FILE* out, byte* src, int
                 }
                 fprintf(out, "/><vertex");
                 for (i = 0; i < rectangle::dim; i++) { 
-                    fprintf(out, " c%d=\"%d\")", i, r.boundary[rectangle::dim+i]);
+                    fprintf(out, " c%d=\"%d\"", i, r.boundary[rectangle::dim+i]);
                 }
                 fprintf(out, "/></rectangle>");
             }
@@ -813,7 +813,8 @@ bool dbDatabase::importField(char* terminator, dbFieldDescriptor* fd, byte* rec,
         *(oid_t*)dst = mapId(id);
         break;
       case dbField::tpRectangle:
-        if (!EXPECT("rectangle")
+        if (!EXPECT(dbXmlScanner::xml_lt)
+            || !EXPECT("rectangle")
             || !EXPECT(dbXmlScanner::xml_gt)
             || !EXPECT(dbXmlScanner::xml_lt)
             || !EXPECT("vertex"))
