@@ -46,7 +46,7 @@ const size_t dbDefaultExtensionQuantum = 4*1024*1024;
 const unsigned dbMaxParallelSearchThreads = 64;
 
 const int dbDefaultParallelScanThreshold = 1000;
-const int dbDefaultPollInterval = 100*1000; // milliseconds
+const int dbDefaultPollInterval = 10*1000; // milliseconds
 const int dbOpenPollInterval = 1000; // milliseconds
 const int dbWaitReadyTimeout = 60*1000; // milliseconds
 const int dbWaitStatusTimeout = 60*1000; // milliseconds 

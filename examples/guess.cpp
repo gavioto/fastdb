@@ -14,7 +14,7 @@ USE_FASTDB_NAMESPACE
 
 const int maxStrLen = 256;
 
-#define CONCURRENT_READ 1
+//#define CONCURRENT_READ 1
 
 class Guess { 
   public:
