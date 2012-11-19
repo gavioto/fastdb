@@ -2715,7 +2715,7 @@ If primary node is crashed, one of standby nodes is activated (<code>open</code>
 returns <code>true</code>) and this instance continue execution.
 If crashed instance is restarted, it will try to connect to all other servers, restore
 it state and continue functioning as standby node, waiting for its chance to replace crashed primary node.
-If primary node is normally terminated, <code>close</code> method of all standby nodes returns <code>false</code>.
+If primary node is normally terminated, <code>open</code> method of all standby nodes returns <code>false</code>.
 <P>
 
 In fault tolerant mode FastDB keeps two files: one with database itself and one with page update counters.

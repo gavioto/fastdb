@@ -8320,7 +8320,11 @@ void dbReplicatedDatabase::reader()
                             }
                             break;
                           case ReplicationRequest::RR_CLOSE:
+                            dbTrace("Receive close request from master\n"); 
                             if (accessType != dbConcurrentRead) { 
+                                dbCriticalSection cs(startCS);
+                                opened = false;
+                                startEvent.signal();
                                 closed = true;
                             }
                             break;
