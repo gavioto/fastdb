@@ -1016,6 +1016,7 @@ that not all fields are described was produced incorrectly)
 1. Add dbReplicatedDatabase::stopReplica method
 
 
---- Release version 3.72 ??.02.2012 -------------------------------------
+--- Release version 3.72 21.11.2012 -------------------------------------
 1. Fix bug in searchArrayOfString
 2. Add check for compatibility between headers and library
+3. Fix handling of normal termination of master
