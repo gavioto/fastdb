@@ -2502,6 +2502,7 @@ bool dbDatabase::open(char_t const* dbName, char_t const* fiName,
     currRBitmapPage = currPBitmapPage = dbBitmapId;
     currRBitmapOffs = currPBitmapOffs = 0;
     reservedChain = NULL;
+    reservedChainLength = 0;
     tables = NULL;
     modified = false;
     selfId = 0;
@@ -5353,12 +5354,14 @@ inline dbDatabase::dbLocation::dbLocation(dbDatabase* dbs, offs_t locPos, size_t
   : pos(locPos), size(locSize), next(dbs->reservedChain), db(dbs)
 {
     db->reservedChain = this;
+    db->reservedChainLength += 1;
 }
 
 inline dbDatabase::dbLocation::~dbLocation()
 {
     assert(db->reservedChain == this);
     db->reservedChain = next;
+    db->reservedChainLength -= 1;
 }
 
 inline int ilog2(offs_t val) 
@@ -5554,8 +5557,13 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
     allocatedSize += (offs_t)size;
 
     if (alignment == 0) {
-        firstPage = (oid_t)currPBitmapPage;
-        offs = DOALIGN(currPBitmapOffs, inc);
+        if (reservedChainLength > dbAllocRecursionLimit) { 
+            firstPage = lastPage-1;
+            offs = 0;
+        } else { 
+            firstPage = (oid_t)currPBitmapPage;
+            offs = DOALIGN(currPBitmapOffs, inc);
+        }
     } else {
         int retries = -1;
         do { 
@@ -5744,7 +5752,7 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
                 offs = 0;
             }
         }
-        if (firstPage == dbBitmapId) { 
+        if (firstPage == dbBitmapId || reservedChainLength > dbAllocRecursionLimit) { 
             if (freeBitmapPage > i) { 
                 i = freeBitmapPage;
                 holeBitSize = holeBeforeFreePage;
@@ -5787,7 +5795,6 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
                 currIndex[j++] = pos + dbPageObjectMarker;
                 pos += dbPageSize;
             }
-            freeBitmapPage = j;
             j = i + objBitSize / pageBits; 
             if (alignment != 0) {
                 currRBitmapPage = j;
@@ -7522,6 +7529,7 @@ bool dbReplicatedDatabase::open(char_t const* dbName, char_t const* fiName,
     currRBitmapPage = currPBitmapPage = dbBitmapId;
     currRBitmapOffs = currPBitmapOffs = 0;
     reservedChain = NULL;
+    reservedChainLength = 0;
     tables = NULL;
     modified = false;
     selfId = 0;

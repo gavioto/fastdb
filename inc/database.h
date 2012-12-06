@@ -94,6 +94,9 @@ const char   dbMatchAnySubstring = '%';
 
 const int    dbMaxReaders = 64; // maximal number of readers concurrently accessing the database
 
+const size_t dbAllocRecursionLimit = 10;
+
+
 /**
  * Predefined object identifiers
  */
@@ -1209,7 +1212,8 @@ class FASTDB_DLL_ENTRY dbDatabase
         ~dbLocation();
     };
     dbLocation* reservedChain;
-    
+    size_t    reservedChainLength;
+
     char_t*   databaseName;
     int       databaseNameLen;
     char_t*   fileName;
