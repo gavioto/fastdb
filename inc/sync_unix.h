@@ -745,11 +745,10 @@ class dbSharedObject : public dbSharedMemory {
 
 // QNX uses a pthread based mutex for its implementation
 //     Use only if pthread support is also enabled, else we'll use the default case
-#if defined(__QNX__) && !defined(NO_PTHREADS)
+#if !defined(NO_PTHREADS) && defined(USE_SHARED_PTHREAD_MUTEX)
 typedef pthread_mutex_t sharedsem_t;
 
 class dbGlobalCriticalSection { 
-    pthread_mutexattr_t attr;
     sharedsem_t* sem;
   public:
     void enter() {
@@ -773,15 +772,18 @@ class dbGlobalCriticalSection {
         return true;
     }
     bool create(char const*, sharedsem_t* shr) { 
+        pthread_mutexattr_t attr;
         sem = shr;
-        pthread_mutexattr_init(&attr);
-        pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
-        pthread_mutexattr_setrecursive(&attr, PTHREAD_RECURSIVE_ENABLE);
+        if (pthread_mutexattr_init(&attr) != 0) { 
+            return false;
+        }
+        if (pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED) != 0) { 
+            return false;
+        }
 #ifdef VXWORKS
-	memset(&sem, '\0', sizeof(*sem));
-#endif // VXWORKS
-        pthread_mutex_init(sem, &attr);
-        return true;
+        memset(sem, 0, sizeof(*sem));
+#endif 
+        return pthread_mutex_init(sem, &attr) == 0;
     }
     void close() {}
     void erase() {

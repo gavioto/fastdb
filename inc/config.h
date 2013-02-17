@@ -104,6 +104,13 @@
 //     instead of SysV semaphores and shared memory
 //#define USE_POSIX_SEMAPHORES 1
 
+// Use process shared pthread mutexes (PTHREAD_PROCESS_SHARED) instead of Sys-V semaphores.
+// It provides 3-5 times increase of performance in case of large number of concurrent transactions.
+// Please notice that process shared semaphreos are not supported by some OSes, for example by Mac OS-X
+//#define USE_SHARED_PTHREAD_MUTEX 1
+#if defined(__QNX__) || defined(__linux__)
+#define USE_SHARED_PTHREAD_MUTEX 1
+#endif
 
 //USE_POSIX_MMAP - if 1 then use Posix mmap for mapping database file and monitor, 
 //  if 0 - use SysV IPC shmem for allocating memory for database file and monitor,

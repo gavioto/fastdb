@@ -1556,7 +1556,7 @@ int dbFile::create(const char* name, int flags)
     assert(!(flags & ram_file));
     this->flags = flags;
     mmapAddr = NULL;
-    fd = ::open(name, O_RDWR|O_TRUNC|O_CREAT|((flags & no_buffering) ? O_DIRECT : 0), 0666);
+    fd = ::open(name, O_RDWR|((flags & truncate) ? O_TRUNC : 0)|O_CREAT|((flags & no_buffering) ? O_DIRECT : 0), 0666);
     if (fd < 0) { 
         return errno;
     }
