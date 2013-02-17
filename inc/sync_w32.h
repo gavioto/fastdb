@@ -299,7 +299,7 @@ class FASTDB_DLL_ENTRY dbWatchDog {
     }
     bool open(char_t const* name) {
 #if defined(_WINCE) || defined(UNICODE)
-	return create(name);
+        return create(name);
 #else
         mutex = OpenMutex(MUTEX_ALL_ACCESS, false, name);
         return mutex != NULL;

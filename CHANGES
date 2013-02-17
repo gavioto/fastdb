@@ -1020,6 +1020,11 @@ that not all fields are described was produced incorrectly)
 2. Add check for compatibility between headers and library
 3. Fix handling of normal termination of master
 
---- Release version 3.73 ??.12.2012 -------------------------------------
+--- Release version 3.73 20.12.2012 -------------------------------------
 1. Limit level of recursion in memory allocator which can cause stack overflow in case of high memory fragmentation
+2. Add USE_SHARED_PTHREAD_MUTEX allowing to use pthread mutexes with PROCESS_SHARED attribute instead of Sys-V semaphores for synchornization.
 
+
+--- Release version 3.74 ??.01.2013 -------------------------------------
+1. Do not always truncate file in dbFile::create
+2. Support passing array parameters in local CLI.

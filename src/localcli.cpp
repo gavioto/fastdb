@@ -344,7 +344,14 @@ int dbCLI::bind_parameter(int           statement,
                           int           var_type,
                           void*         var_ptr)
 {
-    if ((unsigned)var_type >= cli_array_of_oid && var_type != cli_rectangle && var_type != cli_datetime && var_type != cli_wstring && var_type != cli_pwstring) {
+    if ((unsigned)var_type > cli_array_of_oid 
+        && var_type != cli_array_of_int4
+        && var_type != cli_array_of_int8
+        && var_type != cli_rectangle 
+        && var_type != cli_datetime
+        && var_type != cli_wstring 
+        && var_type != cli_pwstring)
+    {
         return cli_unsupported_type;
     }
     statement_desc* s = statements.get(statement);
@@ -575,13 +582,13 @@ int dbCLI::fetch(int statement, int for_update, cli_cardinality_t* n_fetched_rec
                     stmt->query.append(dbQueryElement::qVarWStringPtr, pb->var_ptr);
                     break;
                   case cli_array_of_oid:
-                    stmt->query.append(dbQueryElement::qVarArrayOfRefPtr, pb->var_ptr);
+                    stmt->query.append(dbQueryElement::qVarArrayOfRef, pb->var_ptr);
                     break;
                   case cli_array_of_int4:
-                    stmt->query.append(dbQueryElement::qVarArrayOfInt4Ptr, pb->var_ptr);
+                    stmt->query.append(dbQueryElement::qVarArrayOfInt4, pb->var_ptr);
                     break;
                   case cli_array_of_int8:
-                    stmt->query.append(dbQueryElement::qVarArrayOfInt8Ptr, pb->var_ptr);
+                    stmt->query.append(dbQueryElement::qVarArrayOfInt8, pb->var_ptr);
                     break;
                   case cli_rectangle:
                     stmt->query.append(dbQueryElement::qVarRectangle, pb->var_ptr);
@@ -2729,6 +2736,20 @@ int dbCLI::execute_query(int statement, int for_update, void* record_struct, va_
             *(cli_rectangle_t*)(paramBase + offs) = *va_arg(params, cli_rectangle_t*);
             offs += sizeof(cli_rectangle_t);
             break;
+          case dbQueryElement::qVarArrayOfRefPtr:
+          case dbQueryElement::qVarArrayOfInt4Ptr:
+          case dbQueryElement::qVarArrayOfInt8Ptr:
+            offs = DOALIGN(offs, sizeof(dbAnyArray**));
+            *(dbAnyArray***)(paramBase + offs) = va_arg(params, dbAnyArray**);
+            offs += sizeof(dbAnyArray**);
+            break;
+          case dbQueryElement::qVarArrayOfRef:
+          case dbQueryElement::qVarArrayOfInt4:
+          case dbQueryElement::qVarArrayOfInt8:
+            offs = DOALIGN(offs, sizeof(dbAnyArray*));
+            *(dbAnyArray**)(paramBase + offs) = va_arg(params, dbAnyArray*);
+            offs += sizeof(dbAnyArray*);
+            break;
           default:
             break;
        }
@@ -2841,6 +2862,20 @@ int dbCLI::execute_query(int statement, int for_update, void* record_struct, int
                 offs = DOALIGN(offs, sizeof(cli_coord_t));
                 *(cli_rectangle_t*)(paramBase + offs) = *(cli_rectangle_t*)val;
                 offs += sizeof(cli_rectangle_t);
+                break;
+              case dbQueryElement::qVarArrayOfRefPtr:
+              case dbQueryElement::qVarArrayOfInt4Ptr:
+              case dbQueryElement::qVarArrayOfInt8Ptr:
+                offs = DOALIGN(offs, sizeof(dbAnyArray**));
+                *(dbAnyArray***)(paramBase + offs) = (dbAnyArray**)val;
+                offs += sizeof(dbAnyArray**);
+                break;
+              case dbQueryElement::qVarArrayOfRef:
+              case dbQueryElement::qVarArrayOfInt4:
+              case dbQueryElement::qVarArrayOfInt8:
+                offs = DOALIGN(offs, sizeof(dbAnyArray*));
+                *(dbAnyArray**)(paramBase + offs) = (dbAnyArray*)val;
+                offs += sizeof(dbAnyArray*);
                 break;
               default:
                 return cli_incompatible_type;

@@ -1465,6 +1465,11 @@ The database can be opened by the
 If the file name parameter is omitted, it is constructed from
 the database name by appending the ".fdb" suffix. The database name should
 be an arbitrary identifier consisting of any symbols except '\'.
+<p>
+Database name is used to construct names of synchronization primitives and shared  memory.
+If two processes open database with the same database name but different files names, then it will cause corruption of database file. Please notice that there is difference in naming system resources between Windows and Unix. In Unix names resources are resolved in the same way as files (actually to access some named system resource you need to open file and use ftok function to get key from file handle). In Windows resources have their own name space. So if you use relative path for file/database name,
+for example open("mydatabase") and spawn two processes from two different directories, then at Windows them will create different database files, but use the same synchronization primitives. Which leads to database corruption. Please be very careful with using relative paths at Windows.
+<p>
 The last parameter <code>waitLockTimeout</code> can be set to prevent locking of all
 active processes working with the database when some of them is crashed.
 If the crashed process had locked the database, then no other process can continue 
