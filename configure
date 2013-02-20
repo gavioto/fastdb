@@ -13,7 +13,7 @@
 ## --------------------- ##
 
 # Be more Bourne compatible
-# Rename original FastDB makefuile for GNU environment
+# Rename original FastDB makefile for GNU environment
 mv makefile makefile.gnu
 DUALCASE=1; export DUALCASE # for MKS sh
 if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then
