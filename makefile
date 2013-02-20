@@ -448,7 +448,6 @@ install: subsql cleanupsem inspectsem installlib
 installlib: $(FASTDB_LIB) $(CLI_LIB) $(FASTDB_SHARED) $(CLI_SHARED)
 	mkdir -p $(INCSPATH)
 	cp $(INCS) $(INCSPATH)
-	cp inc/acconfig.h $(INCSPATH)
 	mkdir -p $(LIBSPATH)
 	cp $(FASTDB_LIB) $(CLI_LIB) $(FASTDB_SHARED) $(CLI_SHARED) $(LIBSPATH)
 	(cd $(LIBSPATH) && ln -f -s $(FASTDB_SHARED) libfastdb$(SUFF).so \
