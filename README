@@ -8,7 +8,8 @@ application and provide access to the persistent objects.
 
 To build FastDB library you will need use the proper makefile.
 At Linux and most of other popular Unixes with GCC it is enough to 
-do "make". Alternatively you can look for specialized versions of makefile 
+do "make". You can also use standard way for most of unix systems: ./condifure ; make ; sudo make install.
+Alternatively you can look for specialized versions of makefile 
 included in distributive (like makefile.sun), write you own makefile based
 on standard FastDB makefile or customize some existed makefile.
 
