@@ -7414,6 +7414,7 @@ bool dbReplicatedDatabase::open(OpenParameters& params)
     freeSpaceReuseThreshold = params.freeSpaceReuseThreshold;
     setConcurrency(params.nThreads);
     pollInterval = params.pollInterval;
+    waitLockTimeout = params.waitLockTimeoutMsec;
     waitReadyTimeout = params.waitReadyTimeout;
     waitStatusTimeout = params.waitStatusTimeout;
     recoveryConnectionAttempts = params.recoveryConnectionAttempts;
