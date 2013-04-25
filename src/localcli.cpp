@@ -1933,6 +1933,30 @@ int dbCLI::show_tables(int session, cli_table_descriptor** tables)
     return nTables;
 }
 
+int cli_get_wrapping_rectangle(int session, char const* table, char const* field, cli_rectangle_t* rect)
+{
+    return dbCLI::instance.get_wrapping_rectangle(session, table, field, rect);
+}
+
+int dbCLI::get_wrapping_rectangle(int session, char const* table, char const* field, cli_rectangle_t* rect)
+{
+    session_desc* s = sessions.get(session);
+    if (s == NULL) { 
+        return cli_bad_descriptor;
+    }   
+    dbDatabase* db = s->db;
+    dbTableDescriptor* desc = db->findTableByName(table);
+    if (desc == NULL) {
+        return cli_table_not_found;
+    } else { 
+        dbFieldDescriptor* fd = desc->find(field);
+        if (fd == NULL || fd->type != dbField::tpRectangle || fd->tTree == 0) { 
+            return cli_column_not_found;
+        }
+        dbRtree::cover(db, fd->tTree, *(rectangle*)rect);
+        return cli_ok;
+    }
+}
 
 #define MAX_QUERY_IDENTIFIER_LENGTH 256
 

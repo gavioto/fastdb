@@ -1557,3 +1557,8 @@ int cli_schedule_backup(int session, char const* file_name, int period)
 {
     return cli_not_implemented;
 }
+
+int cli_get_wrapping_rectangle(int session, char const* table, char const* field, cli_rectangle_t* rect)
+{
+    return cli_not_implemented;
+}

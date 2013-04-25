@@ -343,6 +343,7 @@ class FASTDB_DLL_ENTRY dbCLI {
     int detach(int session, int detach_mode);
 
     int get_database_state(int session, cli_database_monitor* monitor);
+    int get_wrapping_rectangle(int session, char const* table, char const* field, cli_rectangle_t* rect);
 
     int close(int session);
 
