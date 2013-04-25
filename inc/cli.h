@@ -998,6 +998,19 @@ int FASTDB_DLL_ENTRY cli_backup(int session, char_t const* file_name, int compac
 int FASTDB_DLL_ENTRY cli_schedule_backup(int session, char_t const* file_name, int period);
 
 
+/**
+ * cli_get_wrapping_rectangle
+ *     Get wrapping rectangle for all objects in table
+ * Parameters:
+ *     session - session descriptor returned by cli_open
+ *     table - table name
+ *     field - sptial index key field name
+ *     rect - pointer to wrapper rectangle
+ * Returns:
+ *     result code as described in cli_result_code enum
+ */
+int FASTDB_DLL_ENTRY cli_get_wrapping_rectangle(int session, char const* table, char const* field, cli_rectangle_t* rect);
+
 
 #ifdef __cplusplus
 }

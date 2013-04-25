@@ -83,6 +83,7 @@ class FASTDB_DLL_ENTRY dbRtree {
     static void  remove(dbDatabase* db, oid_t treeId, oid_t recordId, int offs);
     static void  purge(dbDatabase* db, oid_t treeId);
     static void  drop(dbDatabase* db, oid_t treeId);
+    static void  cover(dbDatabase* db, oid_t treeId, rectangle& r);
 
   protected:
     int4   height;

@@ -117,6 +117,19 @@ bool dbRtree::find(dbDatabase* db, oid_t treeId, dbSearchContext& sc)
     return true;
 }
 
+void dbRtree::cover(dbDatabase* db, oid_t treeId, rectangle& r)
+{
+    dbRtree* tree = (dbRtree*)db->get(treeId);
+    if (tree->height > 0) {
+        dbRtreePage::cover(db, tree->root, r);
+    } else { 
+        for (int i = 0; i < RECTANGLE_DIMENSION; i++) { 
+            r.boundary[i] = 1;
+            r.boundary[i+RECTANGLE_DIMENSION] = 0;
+        }
+    }
+}
+
 void dbRtree::purge(dbDatabase* db, oid_t treeId)
 {
     dbRtree* tree = (dbRtree*)db->put(treeId);
