@@ -1028,3 +1028,4 @@ that not all fields are described was produced incorrectly)
 --- Release version 3.74 ??.01.2013 -------------------------------------
 1. Do not always truncate file in dbFile::create
 2. Support passing array parameters in local CLI.
+3. Fix problem with initialization of autoincremented field in multiple databases

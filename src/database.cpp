@@ -3317,6 +3317,9 @@ oid_t dbDatabase::addNewTable(dbTableDescriptor* desc)
     oid_t tableId = allocateRow(dbMetaTableId, 
                                 sizeof(dbTable) + desc->nFields*sizeof(dbField)
                                 + desc->totalNamesLength());
+#ifdef AUTOINCREMENT_SUPPORT
+    desc->autoincrementCount = dbTableDescriptor::initialAutoincrementCount;
+#endif
     linkTable(desc, tableId);
     desc->storeInDatabase((dbTable*)getRow(tableId));
     return tableId;
