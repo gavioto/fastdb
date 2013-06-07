@@ -202,7 +202,7 @@ class FASTDB_DLL_ENTRY dbAnyCursor : public dbL2List {
     }
 
     /**
-     * Select all records from the table with specfied value of the key
+     * Select all records from the table with specified value of the key
      * @param key name of the key field
      * @param value searched value of the key
      * @return number of selected records
@@ -210,7 +210,7 @@ class FASTDB_DLL_ENTRY dbAnyCursor : public dbL2List {
     cardinality_t selectByKey(char const* key, void const* value);
 
     /**
-     * Select all records from the table with specfied value of the key
+     * Select all records from the table with specified value of the key
      * @param field key field
      * @param value searched value of the key
      * @return number of selected records
@@ -218,7 +218,7 @@ class FASTDB_DLL_ENTRY dbAnyCursor : public dbL2List {
     cardinality_t selectByKey(dbFieldDescriptor* field, void const* value);
 
     /**
-     * Select all records from the table with specfied range of the key values
+     * Select all records from the table with specified range of the key values
      * @param key name of the key field
      * @param minValue inclusive low bound for key values, if <code>NULL</code> then there is no low bound
      * @param maxValue inclusive high bound for key values, if <code>NULL</code> then there is no high bound
@@ -227,7 +227,7 @@ class FASTDB_DLL_ENTRY dbAnyCursor : public dbL2List {
     cardinality_t selectByKeyRange(char const* key, void const* minValue, void const* maxValue);
 
     /**
-     * Select all records from the table with specfied range of the key values
+     * Select all records from the table with specified range of the key values
      * @param field key field
      * @param minValue inclusive low bound for key values, if <code>NULL</code> then there is no low bound
      * @param maxValue inclusive high bound for key values, if <code>NULL</code> then there is no high bound

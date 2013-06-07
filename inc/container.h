@@ -74,7 +74,7 @@ class dbContainer : public dbAnyContainer {
     }
 
     /**
-     * Select records which indexed field is prefix of specfied key
+     * Select records which indexed field is prefix of specified key
      * @param cursor cursor to iterate through selected resords
      * @param key string key which prefixes are located in the index
      * @return number of selected records
