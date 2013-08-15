@@ -2604,7 +2604,7 @@ bool dbDatabase::open(char_t const* dbName, char_t const* fiName,
             
             header->majorVersion= FASTDB_MAJOR_VERSION;
             header->minorVersion = FASTDB_MINOR_VERSION;
-            header->mode = dbHeader::getCurrentMode();
+            header->mode = header->getCurrentMode();
             header->used = used;
 
             index[0] = (offs_t*)(baseAddr + header->root[0].index);
@@ -7639,7 +7639,7 @@ bool dbReplicatedDatabase::open(char_t const* dbName, char_t const* fiName,
             
         header->majorVersion= FASTDB_MAJOR_VERSION;
         header->minorVersion = FASTDB_MINOR_VERSION;
-        header->mode = dbHeader::getCurrentMode();
+        header->mode = header->getCurrentMode();
       
         index[0] = (offs_t*)(baseAddr + header->root[0].index);
         index[1] = (offs_t*)(baseAddr + header->root[1].index);
@@ -8534,7 +8534,7 @@ bool dbHeader::isCompatible()
 
 int dbHeader::getCurrentMode()
 {
-    int mode = MODE_RECTANGLE_DIM * RECTANGLE_DIMENSION * sizeof(RECTANGLE_COORDINATE_TYPE);
+    int mode = (getVersion() < 374 ? MODE_RECTANGLE_DIM_OLD : MODE_RECTANGLE_DIM) * RECTANGLE_DIMENSION * sizeof(RECTANGLE_COORDINATE_TYPE);
 #if dbDatabaseOffsetBits > 32
     mode |= MODE_OFFS_64;
 #endif        

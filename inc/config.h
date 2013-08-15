@@ -239,7 +239,7 @@
 // created by FastDB versions 3.17-3.38.
 //#define PAD_HEADER
 
-// ALIGN_HEADER - align each field of dbHeader class on its page boudary
+// ALIGN_HEADER - align each field of dbHeader class on its size
 // to make it possible to transfer file between systems with different alignment rules
 //#define ALIGN_HEADER true
 

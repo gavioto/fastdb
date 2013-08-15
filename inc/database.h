@@ -137,13 +137,14 @@ class dbHeader {
         MODE_OID_64        = 0x01,
         MODE_OFFS_64       = 0x02,
         MODE_AUTOINCREMENT = 0x04,
-        MODE_RECTANGLE_DIM = 0x08,
+        MODE_RECTANGLE_DIM_OLD = 0x08,
         MODE_NO_PTHREADS   = 0x10,
         MODE_REPLICTION    = 0x20,
         MODE_DO_NOT_REUSE_OID = 0x40,
         MODE_ALIGN_HEADER  = 0x80,
         MODE_PAD_HEADER    = 0x100,
-        MODE_REPLICATION   = 0x200
+        MODE_REPLICATION   = 0x200,
+        MODE_RECTANGLE_DIM = 0x10000
     };    
 
     int getVersion() { 
@@ -151,7 +152,7 @@ class dbHeader {
     }
     
     bool isCompatible();
-    static int getCurrentMode();
+    int getCurrentMode();
 };
 
 union  dbSynthesizedAttribute;
