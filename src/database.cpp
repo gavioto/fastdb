@@ -949,34 +949,49 @@ void _fastcall dbDatabase::execute(dbExprNode*             expr,
         return;
 
       case dbvmInvokeMethodBool:
-        execute(expr->ref.base, iattr, sattr);
-        expr->ref.field->method->invoke(sattr.base, &sattr.bvalue);
-        sattr.bvalue = *(bool*)&sattr.bvalue;
-        return;
+      {
+          bool bvalue;
+          execute(expr->ref.base, iattr, sattr);
+          expr->ref.field->method->invoke(sattr.base, &bvalue);
+          sattr.bvalue = bvalue;
+          return;
+      }
       case dbvmInvokeMethodInt1:
-        execute(expr->ref.base, iattr, sattr);
-        expr->ref.field->method->invoke(sattr.base, &sattr.ivalue);
-        sattr.ivalue = *(int1*)&sattr.ivalue;
-        return;
+      {
+          int1 ivalue;
+          execute(expr->ref.base, iattr, sattr);
+          expr->ref.field->method->invoke(sattr.base, &ivalue);
+          sattr.ivalue = ivalue;
+          return;
+      }
       case dbvmInvokeMethodInt2:
-        execute(expr->ref.base, iattr, sattr);
-        expr->ref.field->method->invoke(sattr.base, &sattr.ivalue);
-        sattr.ivalue = *(int2*)&sattr.ivalue;
-        return;
+      {
+          int2 ivalue;
+          execute(expr->ref.base, iattr, sattr);
+          expr->ref.field->method->invoke(sattr.base, &ivalue);
+          sattr.ivalue = ivalue;
+          return;
+      }
       case dbvmInvokeMethodInt4:
-        execute(expr->ref.base, iattr, sattr);
-        expr->ref.field->method->invoke(sattr.base, &sattr.ivalue);
-        sattr.ivalue = *(int4*)&sattr.ivalue;
-        return;
+      {
+          int4 ivalue;
+          execute(expr->ref.base, iattr, sattr);
+          expr->ref.field->method->invoke(sattr.base, &ivalue);
+          sattr.ivalue = ivalue;
+          return;
+      }
       case dbvmInvokeMethodInt8:
         execute(expr->ref.base, iattr, sattr);
         expr->ref.field->method->invoke(sattr.base, &sattr.ivalue);
         return;
       case dbvmInvokeMethodReal4:
-        execute(expr->ref.base, iattr, sattr);
-        expr->ref.field->method->invoke(sattr.base, &sattr.fvalue); 
-        sattr.fvalue = *(real4*)&sattr.fvalue;
-        return;
+      {
+          real4 fvalue;
+          execute(expr->ref.base, iattr, sattr);
+          expr->ref.field->method->invoke(sattr.base, &fvalue); 
+          sattr.fvalue = fvalue;
+          return;
+      }
       case dbvmInvokeMethodReal8:
         execute(expr->ref.base, iattr, sattr);
         expr->ref.field->method->invoke(sattr.base, &sattr.fvalue);
@@ -1004,28 +1019,43 @@ void _fastcall dbDatabase::execute(dbExprNode*             expr,
         return;
 
       case dbvmInvokeSelfMethodBool:
-        expr->ref.field->method->invoke(iattr.record, &sattr.bvalue);
-        sattr.bvalue = *(bool*)&sattr.bvalue;
-        return;
+      {
+          bool bvalue;
+          expr->ref.field->method->invoke(iattr.record, &bvalue);
+          sattr.bvalue = bvalue;
+          return;
+      }
       case dbvmInvokeSelfMethodInt1:
-        expr->ref.field->method->invoke(iattr.record, &sattr.ivalue);
-        sattr.ivalue = *(int1*)&sattr.ivalue;
-        return;
+      {
+          int1 ivalue;
+          expr->ref.field->method->invoke(iattr.record, &ivalue);
+          sattr.ivalue = ivalue;
+          return;
+      }
       case dbvmInvokeSelfMethodInt2:
-        expr->ref.field->method->invoke(iattr.record, &sattr.ivalue);
-        sattr.ivalue = *(int2*)&sattr.ivalue;
-        return;
+      {
+          int2 ivalue;
+          expr->ref.field->method->invoke(iattr.record, &ivalue);
+          sattr.ivalue = ivalue;
+          return;
+      }
       case dbvmInvokeSelfMethodInt4:
-        expr->ref.field->method->invoke(iattr.record, &sattr.ivalue);
-        sattr.ivalue = *(int4*)&sattr.ivalue;
-        return;
+      {
+          int4 ivalue;
+          expr->ref.field->method->invoke(iattr.record, &ivalue);
+          sattr.ivalue = ivalue;
+          return;
+      }
       case dbvmInvokeSelfMethodInt8:
         expr->ref.field->method->invoke(iattr.record, &sattr.ivalue);
         return;
       case dbvmInvokeSelfMethodReal4:
-        expr->ref.field->method->invoke(iattr.record, &sattr.fvalue); 
-        sattr.fvalue = *(real4*)&sattr.fvalue;
-        return;
+      {
+          real4 fvalue;
+          expr->ref.field->method->invoke(iattr.record, &fvalue); 
+          sattr.fvalue = fvalue;
+          return;
+      }
       case dbvmInvokeSelfMethodReal8:
         expr->ref.field->method->invoke(iattr.record, &sattr.fvalue);
         return;
