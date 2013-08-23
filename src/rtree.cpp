@@ -268,7 +268,7 @@ oid_t dbRtreePage::add_branch(dbDatabase* db, oid_t pageId, branch const& br)
         pg->b[pg->n++] = br;
         return 0;
     }
-    int i, j, seed[2];
+    int i, j, seed[2] = {0,0};
     area_t rect_area[card+1], waste, worst_waste = -INFINITY;
 
     //
