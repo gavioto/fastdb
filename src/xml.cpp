@@ -996,7 +996,7 @@ bool dbDatabase::importField(char* terminator, dbFieldDescriptor* fd, byte* rec,
               break;            
           }
 #if STLPORT_WITH_VC6
-          ((CHAR_STRING*)dst)->assign(scanner.getString(), scanner.getStringLength());
+          ((std::string*)dst)->assign(scanner.getString(), scanner.getStringLength());
 #else
           new (dst) tmp_basic_string(scanner.getString(), scanner.getStringLength(), xmlContext->stdStringAlloc);
 #endif
