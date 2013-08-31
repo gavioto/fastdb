@@ -78,7 +78,7 @@
 #define DISKLESS_CONFIGURATION 1
 #endif // VXWORKS
 //DISKLESS_CONFIGURATION - only in-memory temporary database
-#define DISKLESS_CONFIGURATION 1
+//#define DISKLESS_CONFIGURATION 1
 
 // RECTANGLE_DIMENSION - dimension of built-in rectangle type
 #define RECTANGLE_DIMENSION 2
