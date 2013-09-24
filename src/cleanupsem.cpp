@@ -110,6 +110,7 @@ int main(int argc, char* argv[]) {
     }
     char* databaseName = argv[1];    
     removeSharedMemory(databaseName, ".dm");    
+    removeSharedMemory(databaseName, ".fdb");    
     removeSemaphore(databaseName, ".in");    
     removeSemaphore(databaseName, ".ws");    
     removeSemaphore(databaseName, ".rs");    

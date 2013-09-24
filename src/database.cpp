@@ -2646,6 +2646,8 @@ bool dbDatabase::open(char_t const* dbName, char_t const* fiName,
                 / (dbPageSize*(dbAllocationQuantum*8-1));
             memset(baseAddr+used, 0xFF, (used + bitmapPages*dbPageSize)
                                         / (dbAllocationQuantum*8));
+            memset(baseAddr + used + (used + bitmapPages*dbPageSize) / (dbAllocationQuantum*8), 0, 
+                   bitmapPages*dbPageSize - (used + bitmapPages*dbPageSize) / (dbAllocationQuantum*8));
             size_t i;
             for (i = 0; i < bitmapPages; i++) { 
                 index[0][dbBitmapId + i] = (offs_t)(used + dbPageObjectMarker);
@@ -5592,6 +5594,9 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
     if (alignment == 0) {
         if (reservedChainLength > dbAllocRecursionLimit) { 
             firstPage = lastPage-1;
+            while (firstPage > dbBitmapId && currIndex[firstPage] == dbFreeHandleMarker) { 
+                firstPage -= 1;
+            }
             offs = 0;
         } else { 
             firstPage = (oid_t)currPBitmapPage;
@@ -7304,7 +7309,7 @@ dbDatabase::dbDatabase(dbAccessType type, size_t dbInitSize,
 #endif
                      ;
     if (appMode != libMode) {
-        fprintf(stderr, "Incompatibly between headers and library: %x vs. %x\n", appMode, libMode);
+        fprintf(stderr, "Incompatibility between headers and library: %x vs. %x\n", appMode, libMode);
         exit(1);
     }
 #ifdef AUTO_DETECT_PROCESS_CRASH
