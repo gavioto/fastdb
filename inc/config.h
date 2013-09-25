@@ -146,9 +146,9 @@
 //#define USE_ATL 1
 
 // LARGE_DATABASE_SUPPORT - support databases with size larger than 4Gb.
-// If this macro is defined GigaBASE maximal database size is limited by 1 terrabyte.
+// If this macro is defined FastDB maximal database size is limited by 1 terrabyte.
 // Defnining this macro increase iniitial database size and object index size (because
-// 64-bit offsetss are used instead fo 4-byte offsets). Also GigaBASE library compiled with 
+// 64-bit offsetss are used instead fo 4-byte offsets). Also FastDB library compiled with 
 // LARGE_DATABASE_SUPPOR will not be able to work with database created by library
 // built without LARGE_DATABASE_SUPPOR and visa versa. 
 #if !defined(_WIN32) || defined(_WIN64) // most unixes are now 64-bit, while 32-bit windows is still quite popular
@@ -198,7 +198,7 @@
 // large values (for example 64)
 //#define dbDatabaseOffsetBits 38
 
-// USE_REGEX - use regex library. When this macro is defined GigaBASE provides
+// USE_REGEX - use regex library. When this macro is defined FastDB provides
 // MATCH command. GNU regex or compatible library and headers should be available.
 //#define USE_REGEX true
 
