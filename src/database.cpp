@@ -2531,6 +2531,7 @@ bool dbDatabase::open(char_t const* dbName, char_t const* fiName,
     }
     currRBitmapPage = currPBitmapPage = dbBitmapId;
     currRBitmapOffs = currPBitmapOffs = 0;
+    bitmapEnd = dbBitmapId;
     reservedChain = NULL;
     reservedChainLength = 0;
     tables = NULL;
@@ -5593,10 +5594,15 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
 
     if (alignment == 0) {
         if (reservedChainLength > dbAllocRecursionLimit) { 
-            firstPage = lastPage-1;
-            while (firstPage > dbBitmapId && currIndex[firstPage] == dbFreeHandleMarker) { 
-                firstPage -= 1;
+            firstPage = bitmapEnd;    
+            if (firstPage >= lastPage) { 
+                firstPage = lastPage;
+            } else { 
+                while (firstPage < lastPage && currIndex[firstPage] != dbFreeHandleMarker) { 
+                    firstPage += 1;
+                }
             }
+            bitmapEnd = --firstPage; 
             offs = 0;
         } else { 
             firstPage = (oid_t)currPBitmapPage;
@@ -7567,6 +7573,7 @@ bool dbReplicatedDatabase::open(char_t const* dbName, char_t const* fiName,
     }
     currRBitmapPage = currPBitmapPage = dbBitmapId;
     currRBitmapOffs = currPBitmapOffs = 0;
+    bitmapEnd = dbBitmapId;
     reservedChain = NULL;
     reservedChainLength = 0;
     tables = NULL;

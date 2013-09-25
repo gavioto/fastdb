@@ -1203,6 +1203,8 @@ class FASTDB_DLL_ENTRY dbDatabase
     size_t    currPBitmapPage;  //current bitmap page for allocating page objects
     size_t    currPBitmapOffs;  //offset in current bitmap page for allocating
                                 //page objects
+    size_t    bitmapEnd;
+
     struct dbLocation { 
         offs_t      pos;
         size_t      size;
