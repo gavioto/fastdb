@@ -103,8 +103,11 @@ class Record : public Base {
 
 REGISTER(Record);
 
-USER_FUNC((double(*)(double))sin);
-USER_FUNC((double(*)(double))cos);
+static double mysin(double x) { return sin(x); }
+static double mycos(double x) { return cos(x); }
+
+USER_FUNC(mysin);
+USER_FUNC(mycos);
 
 int main() 
 {
