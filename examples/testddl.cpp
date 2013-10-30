@@ -103,8 +103,8 @@ class Record : public Base {
 
 REGISTER(Record);
 
-USER_FUNC(sin);
-USER_FUNC(cos);
+USER_FUNC((double(*)(double))sin);
+USER_FUNC((double(*)(double))cos);
 
 int main() 
 {

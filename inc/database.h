@@ -1214,7 +1214,7 @@ class FASTDB_DLL_ENTRY dbDatabase
         dbLocation(dbDatabase* db, offs_t pos, size_t size);
         ~dbLocation();
     };
-    friend class dbLocation;
+    friend struct dbLocation;
     dbLocation* reservedChain;
     size_t    reservedChainLength;
 
