@@ -1025,7 +1025,7 @@ that not all fields are described was produced incorrectly)
 2. Add USE_SHARED_PTHREAD_MUTEX allowing to use pthread mutexes with PROCESS_SHARED attribute instead of Sys-V semaphores for synchornization.
 
 
---- Release version 3.74 ??.01.2013 -------------------------------------
+--- Release version 3.74 09.11.2013 -------------------------------------
 1. Do not always truncate file in dbFile::create
 2. Support passing array parameters in local CLI.
 3. Fix problem with initialization of autoincremented field in multiple databases
