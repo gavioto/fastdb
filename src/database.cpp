@@ -6237,26 +6237,24 @@ bool dbDatabase::beginTransaction(dbLockType lockType)
 #if DEBUG_LOCKS
     long selfId = dbThread::getCurrentThreadId();
 #endif
-    if (!ctx->readAccess && !ctx->writeAccess) { 
-        if (commitDelay != 0 && lockType != dbCommitLock) { 
-            dbCriticalSection cs(delayedCommitStopTimerMutex);
-            if (monitor->delayedCommitContext == ctx && ctx->commitDelayed) {
-                // skip delayed transaction because this thread is starting new transaction
-                monitor->delayedCommitContext = NULL;
-                ctx->commitDelayed = false;
-                if (commitTimerStarted != 0) { 
-                    time_t elapsed = time(NULL) - commitTimerStarted;
-                    if (commitTimeout < elapsed) { 
-                        commitTimeout = 0;
-                    } else { 
-                        commitTimeout -= elapsed;               
-                    }
+    if (commitDelay != 0 && lockType != dbCommitLock) { 
+        dbCriticalSection cs(delayedCommitStopTimerMutex);
+        if (monitor->delayedCommitContext == ctx && ctx->commitDelayed) {
+            // skip delayed transaction because this thread is starting new transaction
+            monitor->delayedCommitContext = NULL;
+            ctx->commitDelayed = false;
+            if (commitTimerStarted != 0) { 
+                time_t elapsed = time(NULL) - commitTimerStarted;
+                if (commitTimeout < elapsed) { 
+                    commitTimeout = 0;
+                } else { 
+                    commitTimeout -= elapsed;               
                 }
-                delayedCommitStopTimerEvent.signal();
-            } else { 
-                monitor->forceCommitCount += 1; 
-                delayedCommitForced = true;
             }
+            delayedCommitStopTimerEvent.signal();
+        } else { 
+            monitor->forceCommitCount += 1; 
+            delayedCommitForced = true;
         }
     }
     
@@ -6275,7 +6273,7 @@ bool dbDatabase::beginTransaction(dbLockType lockType)
                 recovery();
             }
 #endif
-        } else {
+        } else if (!delayedCommitForced) {
             return true;
         }
     } else if (lockType != dbSharedLock) { 
@@ -6387,7 +6385,9 @@ bool dbDatabase::beginTransaction(dbLockType lockType)
             if (monitor->ownerPid != ctx->currPid) { 
                 handleError(LockRevoked);
             }
-            return true;
+            if (!delayedCommitForced) {
+                return true;
+            }
         }
     } else { 
         if (!ctx->readAccess && !ctx->writeAccess) { 
@@ -6439,7 +6439,7 @@ bool dbDatabase::beginTransaction(dbLockType lockType)
                 cs.leave();
             }
             ctx->readAccess = true;
-        } else {
+        } else if (!delayedCommitForced) {
             return true;
         }
     }
