@@ -187,10 +187,12 @@ int FASTDB_DLL_ENTRY cli_open(char const* server_url,
                               int         reconnect_timeout_sec);
 
 enum cli_open_attributes { 
-    cli_open_default    = 0x0, 
-    cli_open_readonly   = 0x1, 
-    cli_open_truncate   = 0x2,
-    cli_open_concurrent = 0x4
+    cli_open_default    = 0x00, 
+    cli_open_readonly   = 0x01, 
+    cli_open_truncate   = 0x02,
+    cli_open_concurrent = 0x04,
+    cli_open_force_read = 0x08,
+    cli_open_no_sync    = 0x10
 };
 /*********************************************************************
  * cli_create

@@ -1034,3 +1034,8 @@ that not all fields are described was produced incorrectly)
 
 --- Release version 3.75 21.13.2013 -------------------------------------
 1. Undo changes in release 3.70.
+
+
+
+--- Release version 3.76 ??.02.2014 -------------------------------------
+1. Add cli_open_force_read and cli_open_no_sync flags
