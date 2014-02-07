@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
         if (db.open(WC_STRING(dbName), WC_STRING(fileName), replNodeId, servers, itemsof(servers))) { 
             printf("Update process started, now you should start inspectors: \"testconc inspector 1 N\", where N is number of inspectpors\n");            
 #else 
-            dbDatabase db(dbDatabase::dbConcurrentUpdate, 4LL*1024*1024*1024);
+        dbDatabase db(dbDatabase::dbConcurrentUpdate);
         if (db.open(WC_STRING(dbName))) { 
             printf("Update process started, now you should start inspectors: \"testconc inspector N\", where N is number of inspectpors\n");            
 #endif
