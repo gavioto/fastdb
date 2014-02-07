@@ -71,15 +71,25 @@ int dbCLI::create_session(char_t const* databaseName,
     }
     if (db == NULL) { 
         FASTDB_TRY
-        db = new dbDatabase((openAttr & cli_open_readonly) 
-                            ? (openAttr & cli_open_concurrent) 
-                              ? dbDatabase::dbConcurrentRead : dbDatabase::dbReadOnly 
-                            : (openAttr & cli_open_concurrent) 
-                              ? dbDatabase::dbConcurrentUpdate : dbDatabase::dbAllAccess,
-                            initDatabaseSize, 
-                            extensionQuantum, 
-                            initIndexSize);     
-        if (!db->open(databaseName, filePath, INFINITE, transactionCommitDelay)) {
+        db = new dbDatabase();
+        dbDatabase::OpenParameters params;
+        params.databaseName = databaseName;
+        params.databaseFilePath = filePath;
+        params.transactionCommitDelay = transactionCommitDelay;
+        params.initSize = initDatabaseSize;
+        params.accessType = 
+            (openAttr & cli_open_readonly) 
+            ? (openAttr & cli_open_concurrent) 
+              ? dbDatabase::dbConcurrentRead : dbDatabase::dbReadOnly 
+              : (openAttr & cli_open_concurrent) 
+                ? dbDatabase::dbConcurrentUpdate : dbDatabase::dbAllAccess;
+        params.extensionQuantum = extensionQuantum;
+        params.initIndexSize = initIndexSize;
+        params.fileOpenFlags = ((openAttr & cli_open_force_read) ? dbFile::force_read : 0) 
+            | ((openAttr & cli_open_no_sync) ? dbFile::no_sync : 0) 
+            | ((openAttr & cli_open_truncate) ? dbFile::truncate : 0); 
+            
+        if (!db->open(params)) { 
             db->close();
             delete db;
             return cli_database_not_found;

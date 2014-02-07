@@ -74,6 +74,7 @@
 //  This option is needed if DLL library using FastDB can be unloaded.
 //#define CLONE_IDENTIFIERS 1 
 
+#define DISKLESS_CONFIGURATION 1
 #ifdef VXWORKS
 #define DISKLESS_CONFIGURATION 1
 #endif // VXWORKS
