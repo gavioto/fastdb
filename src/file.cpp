@@ -696,7 +696,9 @@ int dbFile::open(char_t const* fileName, char_t const* sharedName, int flags,
         return status;
     } 
     if (flags & force_read) {
-        forceRead(mmapAddr, fileSize);
+        if (forceRead(mmapAddr, fileSize) != 0) { 
+			this->flags &= ~force_read; // this hack is needed to prevent compilter from elimination of this function call
+		}
     }
     if (status != ERROR_ALREADY_EXISTS && mmapSize > fileSize)
         //      && osinfo.dwPlatformId != VER_PLATFORM_WIN32_NT) 
@@ -1382,7 +1384,9 @@ int dbFile::open(char const* name, char const*, int flags, size_t initSize, bool
         return status;
     }
     if (flags & force_read) {
-        forceRead(mmapAddr, mmapSize);
+        if (forceRead(mmapAddr, mmapSize) != 0) { 
+			this->flags &= ~force_read; // this hack is needed to prevent compilter from elimination of this function call
+		}
     }
 #endif // NO_MMAP
 #endif // USE_SYSV_SHARED_MEMORY && DISKLESS_CONIFIGURATION
