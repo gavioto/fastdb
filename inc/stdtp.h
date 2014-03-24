@@ -13,12 +13,6 @@
 
 #include "config.h"
 
-#ifdef UNICODE
-typedef wchar_t char_t;
-#else
-typedef char char_t;
-#endif
-
 #ifdef FASTDB_DLL
 #ifdef INSIDE_FASTDB
 #define FASTDB_DLL_ENTRY __declspec(dllexport)
@@ -210,6 +204,7 @@ extern FASTDB_DLL_ENTRY void dbTrace(char* message, ...);
 	#endif
 
     typedef struct ::_stat STATSTRUCT;
+    typedef wchar_t char_t;
 
 	#define CNV_BUF_SIZE 256
 	inline wchar_t* convertStringToUnicode(wchar_t* dst, char const* src, size_t size) { mbstowcs(dst, src, size); return dst; }
@@ -234,6 +229,7 @@ extern FASTDB_DLL_ENTRY void dbTrace(char* message, ...);
 	#endif
 
     typedef struct ::stat STATSTRUCT;
+    typedef char char_t;
 
 	#define WC_STRING(s) s
 
