@@ -66,6 +66,7 @@ DBVM(dbvmInString, tpBoolean, 2, dbvmVoid)
 DBVM(dbvmInWString, tpBoolean, 2, dbvmVoid)
 DBVM(dbvmOverlapsRectangle, tpBoolean, 2, dbvmOverlapsRectangle)
 DBVM(dbvmRectangleArea, tpReal, 1, dbvmVoid)
+DBVM(dbvmRectangleDistance, tpReal, 2, dbvmRectangleDistance)
 
 DBVM(dbvmLength, tpInteger, 1, dbvmVoid)
 DBVM(dbvmStringLength, tpInteger, 1, dbvmVoid)
@@ -112,7 +113,7 @@ DBVM(dbvmCurrent, tpReference, 0, dbvmVoid)
 DBVM(dbvmFirst, tpReference, 0, dbvmVoid)
 DBVM(dbvmLast, tpReference, 0, dbvmVoid)
 
-    
+
 DBVM(dbvmOrBool,  tpBoolean, 2, dbvmOrBool)
 DBVM(dbvmAndBool, tpBoolean, 2, dbvmAndBool)
 DBVM(dbvmNotBool, tpBoolean, 1, dbvmVoid)
@@ -129,7 +130,7 @@ DBVM(dbvmOrInt,  tpInteger, 2, dbvmOrInt)
 DBVM(dbvmNotInt, tpInteger, 1, dbvmVoid)
 DBVM(dbvmAbsInt, tpInteger, 1, dbvmVoid)
 DBVM(dbvmPowerInt, tpInteger, 2, dbvmVoid)
-    
+
 DBVM(dbvmEqInt, tpBoolean, 2, dbvmEqInt)
 DBVM(dbvmNeInt, tpBoolean, 2, dbvmNeInt)
 DBVM(dbvmGtInt, tpBoolean, 2, dbvmLtInt)
@@ -229,14 +230,14 @@ DBVM(dbvmWStringConcat, tpWString, 2, dbvmWStringConcat)
 DBVM(dbvmMbsToWcs, tpWString, 1, dbvmVoid)
 DBVM(dbvmWcsToMbs, tpString, 1, dbvmVoid)
 
-DBVM(dbvmDeref, tpReference, 1, dbvmVoid) 
+DBVM(dbvmDeref, tpReference, 1, dbvmVoid)
 
-DBVM(dbvmExists, tpBoolean, 1, dbvmVoid) 
-DBVM(dbvmVariable, tpFreeVar, 0, dbvmVoid) 
+DBVM(dbvmExists, tpBoolean, 1, dbvmVoid)
+DBVM(dbvmVariable, tpFreeVar, 0, dbvmVoid)
 
-DBVM(dbvmList, tpList, 2, dbvmVoid) 
+DBVM(dbvmList, tpList, 2, dbvmVoid)
 
-DBVM(dbvmFuncInt2Bool, tpBoolean, 1, dbvmVoid) 
+DBVM(dbvmFuncInt2Bool, tpBoolean, 1, dbvmVoid)
 DBVM(dbvmFuncReal2Bool, tpBoolean, 1, dbvmVoid)
 DBVM(dbvmFuncStr2Bool, tpBoolean, 1, dbvmVoid)
 DBVM(dbvmFuncWStr2Bool, tpBoolean, 1, dbvmVoid)
@@ -274,6 +275,6 @@ DBVM(dbvmFuncArgArgArg2Str,  tpString,  3, dbvmVoid)
 DBVM(dbvmFuncArgArgArg2WStr,  tpWString,  3, dbvmVoid)
 
 
-DBVM(dbvmVoid, tpVoid, 0, dbvmVoid) 
+DBVM(dbvmVoid, tpVoid, 0, dbvmVoid)
 
 #undef DBVM

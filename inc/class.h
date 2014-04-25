@@ -21,7 +21,7 @@
 
 BEGIN_FASTDB_NAMESPACE
 
-#ifndef dbDatabaseOffsetBits 
+#ifndef dbDatabaseOffsetBits
 #ifdef LARGE_DATABASE_SUPPORT
 #define dbDatabaseOffsetBits 40 // up to 1 terabyte
 #else
@@ -29,7 +29,7 @@ BEGIN_FASTDB_NAMESPACE
 #endif
 #endif
 
-#ifndef dbDatabaseOidBits 
+#ifndef dbDatabaseOidBits
 #define dbDatabaseOidBits 32
 #endif
 
@@ -58,7 +58,7 @@ typedef oid_t cardinality_t;
 /**
  * Types of field index
  */
-enum dbIndexType { 
+enum dbIndexType {
     HASHED  = 1,                   // hash table
     INDEXED = 2,                   // T-Tree
     CASE_INSENSITIVE = 4,          // Index is case insensitive
@@ -91,7 +91,7 @@ enum dbIndexType {
 typedef int (*dbUDTComparator)(void const*, void const*, size_t);
 
 /**
- * Prototype for user defined hash function 
+ * Prototype for user defined hash function
  */
 typedef unsigned (*dbUDTHashFunction)(void const*, size_t);
 
@@ -113,8 +113,8 @@ typedef unsigned (*dbUDTHashFunction)(void const*, size_t);
 #define RAWKEY(x, index) UDT(x, index, &memcmp)
 
 /**
- * Macro for describing relations between two tables. 
- * <code>x</code> should specify name of reference or array of reference field in this table, 
+ * Macro for describing relations between two tables.
+ * <code>x</code> should specify name of reference or array of reference field in this table,
  * and <code>inverse</code> - field in the referenced table contining inverse reference.
  */
 #define RELATION(x,inverse) \
@@ -122,19 +122,19 @@ typedef unsigned (*dbUDTHashFunction)(void const*, size_t);
                                                                   sizeof(x), 0, #inverse), x))
 
 /**
- * Macro for describing relations between two tables.  
- * <code>x</code> should specify name of reference field in this table for which index will be created, 
+ * Macro for describing relations between two tables.
+ * <code>x</code> should specify name of reference field in this table for which index will be created,
  * and <code>inverse</code> - field in the referenced table contining inverse reference.
  */
 #define INDEXED_RELATION(x,inverse) \
     (*FASTDB_NS::dbDescribeField(new FASTDB_NS::dbFieldDescriptor(#x, (char*)&x-(char*)this, \
                                                                   sizeof(x), FASTDB_NS::INDEXED, #inverse), x))
- 
+
 
 /**
  * Macro used to define relation owner (when owner is deleted, all referenced
- * members are also deleted). Members of of this relation should use 
- * <code>RELATION</code> macro to describe relation with owner.  
+ * members are also deleted). Members of of this relation should use
+ * <code>RELATION</code> macro to describe relation with owner.
  */
 #define OWNER(x,member) \
     (*FASTDB_NS::dbDescribeField(new FASTDB_NS::dbFieldDescriptor(#x, (char*)&x-(char*)this, \
@@ -160,7 +160,7 @@ typedef unsigned (*dbUDTHashFunction)(void const*, size_t);
     FASTDB_NS::dbFieldDescriptor* dbDescribeComponents(FASTDB_NS::dbFieldDescriptor*) { \
         return &fields; \
     } \
-    static FASTDB_NS::dbTableDescriptor dbDescriptor 
+    static FASTDB_NS::dbTableDescriptor dbDescriptor
 
 
 /**
@@ -173,7 +173,7 @@ typedef unsigned (*dbUDTHashFunction)(void const*, size_t);
     FASTDB_NS::dbFieldDescriptor* dbDescribeComponents(FASTDB_NS::dbFieldDescriptor*) { \
         return &fields; \
     } \
-    static FASTDB_NS::dbTableDescriptor dbDescriptor 
+    static FASTDB_NS::dbTableDescriptor dbDescriptor
 
 /**
  * Register table descriptor and assign it to specified database
@@ -191,7 +191,7 @@ typedef unsigned (*dbUDTHashFunction)(void const*, size_t);
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER+0 <= 1300
-    #define TABLE_DESC_PREFIX 
+    #define TABLE_DESC_PREFIX
 #else
     #define TABLE_DESC_PREFIX template<>
 #endif
@@ -229,7 +229,7 @@ typedef unsigned (*dbUDTHashFunction)(void const*, size_t);
                                                          &dbDescribeComponentsOf##ns##__##table)
 
 /**
- * Register table descripttor. It will be assigned to the database when database will be 
+ * Register table descripttor. It will be assigned to the database when database will be
  * opened
  */
 #define REGISTER(table) REGISTER_IN(table, NULL)
@@ -257,7 +257,7 @@ class dbAnyMethodTrampoline;
 /**
  * Descriptor of table field
  */
-class FASTDB_DLL_ENTRY dbFieldDescriptor { 
+class FASTDB_DLL_ENTRY dbFieldDescriptor {
   public:
     /**
      * Next file within scope
@@ -272,7 +272,7 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
      * Next field in the list of all fields in the table
      */
     dbFieldDescriptor* nextField;
-    
+
     /**
      * Next field in the list of all hashed fields in the table
      */
@@ -292,7 +292,7 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
      * Column number
      */
     int                fieldNo;
-    
+
     /**
      * Name of the field
      */
@@ -326,7 +326,7 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
     /**
      * Inverse reference name (for reference fields only)
      */
-    char*              inverseRefName;  
+    char*              inverseRefName;
 
     /**
      * Type of the field in the database (dbField::FieldTypes)
@@ -343,21 +343,21 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
      */
     int                indexType;
 
-    /** 
+    /**
      * Offset to the field in database
      */
     int                dbsOffs;
 
-    /** 
+    /**
      * Offset to the field in application
-     */    
+     */
     int                appOffs;
 
     /**
      * Subcomponents of the field (for structures and arrays)
      */
     dbFieldDescriptor* components;
-    
+
     /**
      * Hash table (for fields which are indexed by means of hash table)
      */
@@ -372,14 +372,14 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
      * Size of the record in database
      */
     size_t             dbsSize;
-    
+
     /**
      * Size of the object in application
      */
     size_t             appSize;
 
     /**
-     * Alignment of the field in the database (for structures it is equal to the maximum required alignment 
+     * Alignment of the field in the database (for structures it is equal to the maximum required alignment
      * of it's components
      */
     size_t             alignment;
@@ -403,7 +403,7 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
     /**
      * Attributes of the field
      */
-    enum FieldAttributes { 
+    enum FieldAttributes {
         ComponentOfArray   = 0x01,
         HasArrayComponents = 0x02,
         OneToOneMapping    = 0x04,
@@ -434,15 +434,15 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
      * Allocator of array components
      */
     void (*arrayAllocator)(dbAnyArray* array, void* data, size_t length);
-    
+
 
     /**
      * Calculate record size in the database.
      * This method performs interation through all components in one scope
-     * and recursively invokes itself for structure and array components. 
+     * and recursively invokes itself for structure and array components.
      * First time this method is invoked by table descriptor with <code>offs</code>
      * equal to size of fixed part of the record.
-     * @param base address of the application object 
+     * @param base address of the application object
      * @param offs offset of the end of varying part of the record
      * @return size of the record
      */
@@ -452,16 +452,16 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
      * Calculate record size after reformatting record according
      * to the new definition of the application class.
      * This method performs interation thtough all components in one scope
-     * and recursively invoke itself for structure and array components. 
-     * @param base address of the application object 
+     * and recursively invoke itself for structure and array components.
+     * @param base address of the application object
      * @param offs offset of the end of varying part of the record
      * @return size of the record
      */
     size_t calculateNewRecordSize(byte* base, size_t offs);
-    
+
     /**
      * Convert of the feild to new format.
-     * This method is recursively invoked for array and structure components.     
+     * This method is recursively invoked for array and structure components.
      * @param dst destination for converted field
      * @param src original field
      * @param offs offset of varying part
@@ -471,18 +471,18 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
     size_t convertRecord(byte* dst, byte* src, size_t offs);
 
     /**
-     * Size of the record without one field. This method is used to implement 
+     * Size of the record without one field. This method is used to implement
      * automatically updated inverse references.
      * This method performs interation thtough all components in one scope
-     * and recursively invoke itself for structure and array components.      
+     * and recursively invoke itself for structure and array components.
      * @param field list of the fields in one scope
      * @param base pointer inside database
      * @param size [in/out] size of the record
      * @return offset of last field
      */
-    int    sizeWithoutOneField(dbFieldDescriptor* field, 
+    int    sizeWithoutOneField(dbFieldDescriptor* field,
                                byte* base, size_t& size);
-    
+
     /**
      * Recursively copy record to new location except one field. This method
      * is used for updating inverse references.
@@ -492,8 +492,8 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
      * @param offs offset to the end of varying part
      * @return size of the record
      */
-    size_t copyRecordExceptOneField(dbFieldDescriptor* field, 
-                                    byte* dst, byte* src, size_t offs); 
+    size_t copyRecordExceptOneField(dbFieldDescriptor* field,
+                                    byte* dst, byte* src, size_t offs);
 
     enum StoreMode {
         Insert,
@@ -504,19 +504,19 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
     /**
      * Store record fields in the databases
      * This method performs interation thtough all components in one scope
-     * and recursively invoke itself for structure and array components.      
+     * and recursively invoke itself for structure and array components.
      * @param dst place in the database where record should be stored
      * @param src pointer to the application object
      * @param offs offset to the end of varying part
      * @param mode store mode
      * @return size of the record
-     */     
+     */
     size_t storeRecordFields(byte* dst, byte* src, size_t offs, StoreMode mode);
 
     /**
      * Mask updated fields.
      * This method performs interation thtough all components in one scope
-     * and recursively invoke itself for structure and array components.      
+     * and recursively invoke itself for structure and array components.
      * @param dst old image of the record in the database
      * @param src updated application object
      */
@@ -525,7 +525,7 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
     /**
      * Fetch record from the database
      * This method performs interation thtough all components in one scope
-     * and recursively invoke itself for structure and array components.      
+     * and recursively invoke itself for structure and array components.
      * @param dst pointer to the application object into which record is extract
      * @param src image of the object in the database
      */
@@ -535,7 +535,7 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
      * Adjust references in all fetched records (current records in all opened cursors)
      * when database was reallocated.
      * @param record pointer to the application object which references should be adjusted
-     * @param base new address of memory mapping 
+     * @param base new address of memory mapping
      * @param size database isze before extension
      * @param shift difference between old and new addresses of memory mapping obejct location.
      */
@@ -559,7 +559,7 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
      * Get first component of the field (for structures only)
      * @return first component of the structure
      */
-    dbFieldDescriptor* getFirstComponent() { 
+    dbFieldDescriptor* getFirstComponent() {
         return components;
     }
 
@@ -567,20 +567,20 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
      * Get next component within the scope
      * @return next component within the scope
      */
-    dbFieldDescriptor* getNextComponent(dbFieldDescriptor* field) { 
-        if (field != NULL) { 
+    dbFieldDescriptor* getNextComponent(dbFieldDescriptor* field) {
+        if (field != NULL) {
             field = field->next;
-            if (field == components) { 
+            if (field == components) {
                 return NULL;
             }
         }
         return field;
     }
-        
-    /** 
+
+    /**
      * Redefined ',' operator used to form list of components
      */
-    dbFieldDescriptor& operator, (dbFieldDescriptor& field) { 
+    dbFieldDescriptor& operator, (dbFieldDescriptor& field) {
         dbFieldDescriptor* tail = field.prev;
         tail->next = this;
         prev->next = &field;
@@ -606,12 +606,12 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
      * @param inverse name of inverse field
      * @param components comopnents of structure or array
      */
-    dbFieldDescriptor(char const* name, size_t offs, size_t size, int indexType, 
+    dbFieldDescriptor(char const* name, size_t offs, size_t size, int indexType,
                       char const* inverse = NULL,
                       dbFieldDescriptor* components = NULL);
 
     /**
-     * Constructor of dummy field descriptor 
+     * Constructor of dummy field descriptor
      * @param  name name of the field
      */
     dbFieldDescriptor(char const* name);
@@ -639,7 +639,7 @@ class FASTDB_DLL_ENTRY dbFieldDescriptor {
 /**
  * Table descriptor
  */
-class FASTDB_DLL_ENTRY dbTableDescriptor { 
+class FASTDB_DLL_ENTRY dbTableDescriptor {
     friend class dbCompiler;
     friend class dbDatabase;
     friend class dbReplicatedDatabase;
@@ -649,6 +649,7 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
     friend class dbHashTable;
     friend class dbTtreeNode;
     friend class dbRtreePage;
+    friend class dbRtree;
     friend class dbServer;
     friend class dbColumnBinding;
     friend class dbFieldDescriptor;
@@ -682,8 +683,8 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
     /**
      * List of table columns
      */
-    dbFieldDescriptor*  columns; 
-    
+    dbFieldDescriptor*  columns;
+
     /**
      * List of hashed fields
      */
@@ -713,7 +714,7 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
      * Attached database
      */
     dbDatabase*         db;
-    
+
     /**
      * Database staticly attached to the table (by means of REGISTER_IN macro)
      */
@@ -751,7 +752,7 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
 
 
     /**
-     * When unassigned table descriptor is explicitly assigned to the database, 
+     * When unassigned table descriptor is explicitly assigned to the database,
      * new clone of descriptor is created and  <code>cloneOf</code> field of this descriptor
      * referes to original table descriptor.
      */
@@ -782,24 +783,24 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
     /**
      * Recursively set field attributes.
      * @param fieldsList list of record fields
-     * @param prefix prefix for the field (in case of structures or arrays 
+     * @param prefix prefix for the field (in case of structures or arrays
      * this functions is invoked resursively for components of this structure or
      * or array
      * @param offs - offset in application class
      * @param indexMask index mask for the structore containing the field
      * @param attr field asttributes
-     * @param dbsAlignment maximal alignment of the fields in the database 
-     * @param appAlignment maximal alignment of the fields in the application 
+     * @param dbsAlignment maximal alignment of the fields in the database
+     * @param appAlignment maximal alignment of the fields in the application
      */
-    void calculateFieldsAttributes(dbFieldDescriptor* fieldsList, 
-                                   char const* prefix, int offs, 
+    void calculateFieldsAttributes(dbFieldDescriptor* fieldsList,
+                                   char const* prefix, int offs,
                                    int indexMask, int& attr,
                                    size_t& dbsAlignment, size_t& appAlignment);
 
     /**
      * Read table definiton from the database and build fields list
      * @param table databsae table descriptor
-     * @param prefix prefix for the field (in case of structures or arrays 
+     * @param prefix prefix for the field (in case of structures or arrays
      * @param prefixLen length of the prefix
      * @param attr attributes of the parent field
      * @return pointer to the constructed list
@@ -808,34 +809,34 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
 
   public:
     /**
-     * Initial value for autoincrement count. To take effect, this value should be 
-     * assigned before database open. 
+     * Initial value for autoincrement count. To take effect, this value should be
+     * assigned before database open.
      */
     static int initialAutoincrementCount;
 
     /**
      * Get table identifier
      */
-    oid_t getId() { 
+    oid_t getId() {
         return tableId;
     }
 
     /**
      * Get next table in database
      */
-    dbTableDescriptor* getNextTable() { 
+    dbTableDescriptor* getNextTable() {
         return nextDbTable;
     }
 
     /**
      * Find field with specified symbol name
-     */    
+     */
     dbFieldDescriptor* findSymbol(char const* name);
 
 
     /**
      * Find field with specified name
-     */    
+     */
     dbFieldDescriptor* find(char const* name);
 
 
@@ -843,7 +844,7 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
      * Get first record field
      * @return descriptor of first record field
      */
-    dbFieldDescriptor* getFirstField() { 
+    dbFieldDescriptor* getFirstField() {
         return columns;
     }
 
@@ -851,7 +852,7 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
      * Get last value of autoincrement counter used for this table
      * @return last value of autoincrement counter used for this table
      */
-    int getLastValueOfAutoincrementCount() const { 
+    int getLastValueOfAutoincrementCount() const {
         return autoincrementCount;
     }
 
@@ -860,10 +861,10 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
      * @param field current  field
      * @return next field after the current in table fields list
      */
-    dbFieldDescriptor* getNextField(dbFieldDescriptor* field) { 
-        if (field != NULL) { 
+    dbFieldDescriptor* getNextField(dbFieldDescriptor* field) {
+        if (field != NULL) {
             field = field->next;
-            if (field == columns) { 
+            if (field == columns) {
                 return NULL;
             }
         }
@@ -873,14 +874,14 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
     /**
      * Get table name.
      */
-    char* getName() { 
+    char* getName() {
         return name;
     }
 
     /**
      * Get size of instance of the class in an application
      */
-    size_t size() { 
+    size_t size() {
         return appSize;
     }
 
@@ -899,8 +900,8 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
     bool equal(dbTable* table);
 
     /**
-     * Check whether fprmats of table descriptor in the database 
-     * and in application is compatible. This method also prepares 
+     * Check whether fprmats of table descriptor in the database
+     * and in application is compatible. This method also prepares
      * information for performing conversion of record to new format
      * @param table database table descriptor
      * @param confirmDeleteColumns whether deletion of columns in allowed from non empty table
@@ -910,8 +911,8 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
     bool match(dbTable* table, bool confirmDeleteColumns, bool isEmpty);
 
     /**
-     * Check consuistency of declared realations (check that referenced table 
-     * actually contains declared inverse reference field). 
+     * Check consuistency of declared realations (check that referenced table
+     * actually contains declared inverse reference field).
      * This method also resolve references between table.
      */
     bool checkRelationship();
@@ -920,9 +921,9 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
      * Get reference to associated database
      * @return database to which this table is assigned
      */
-    dbDatabase* getDatabase() { 
+    dbDatabase* getDatabase() {
         assert(db != DETACHED_TABLE);
-        return db; 
+        return db;
     }
 
     /**
@@ -945,7 +946,7 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
 
     /**
      * Construct table descriptor using information stored in database
-     * @param db database 
+     * @param db database
      * @param table pointer to database table descriptor
      */
     dbTableDescriptor(dbDatabase* db, dbTable* table);
@@ -958,7 +959,7 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
      * @param func function returninglist of field descriptors
      * @param original original table descriptor (for cloned descriptors)
      */
-    dbTableDescriptor(char const* tableName, dbDatabase* db, size_t objSize, 
+    dbTableDescriptor(char const* tableName, dbDatabase* db, size_t objSize,
                       describeFunc func, dbTableDescriptor* original = NULL);
 
     /**
@@ -970,7 +971,7 @@ class FASTDB_DLL_ENTRY dbTableDescriptor {
 /**
  * Header of database array or string
  */
-struct dbVarying { 
+struct dbVarying {
     nat4 size; // number of elements in the array
     int4 offs; // offset from the beginning of the record
 };
@@ -978,15 +979,15 @@ struct dbVarying {
 /**
  * Database record for storing field descriptor
  */
-struct dbField { 
-    enum FieldTypes { 
+struct dbField {
+    enum FieldTypes {
         tpBool,
         tpInt1,
         tpInt2,
         tpInt4,
         tpInt8,
-        tpReal4, 
-        tpReal8, 
+        tpReal4,
+        tpReal8,
         tpString,
         tpReference,
         tpArray,
@@ -1000,7 +1001,7 @@ struct dbField {
         tpMethodString,
         tpMethodReference,
         tpStructure,
-        tpRawBinary, 
+        tpRawBinary,
         tpStdString,
         tpRectangle,
         tpWString,
@@ -1008,28 +1009,28 @@ struct dbField {
         tpMethodWString,
         tpUnknown
     };
-        
+
     /**
      * Full name of the field (for example "x.y.z")
      */
-    dbVarying name;    
+    dbVarying name;
 
     /**
      * Name of referenced table( only for references)
      */
-    dbVarying tableName; 
+    dbVarying tableName;
 
     /**
      * Name of inverse reference field (only for refereces)
      */
-    dbVarying inverse; 
-    
+    dbVarying inverse;
+
     /**
      * Field type: one of <code>dbField::FieldTypes</code> constants
      */
 #ifdef OLD_FIELD_DESCRIPTOR_FORMAT
     int4      type;
-#else 
+#else
 #if BYTE_ORDER == BIG_ENDIAN
     int4      flags : 24;
     int4      type  : 8;
@@ -1042,7 +1043,7 @@ struct dbField {
     /**
      *  Offset of the field in the record
      */
-    int4      offset; 
+    int4      offset;
 
     /**
      * Size of the field
@@ -1058,13 +1059,13 @@ struct dbField {
      * T-Tree for field indexed by means of T-Ttree
      */
     oid_t     tTree;
-};     
+};
 
 
 /**
  * Header of any database record
  */
-class dbRecord { 
+class dbRecord {
   public:
     /**
      * Size of the record (including header
@@ -1086,13 +1087,13 @@ class dbRecord {
 /**
  * Database recod for storing table descriptor
  */
-class dbTable : public dbRecord { 
+class dbTable : public dbRecord {
   public:
     /**
      * Name of the table
      */
     dbVarying name;
-    
+
     /**
      * Array with field descriptors
      */
@@ -1112,7 +1113,7 @@ class dbTable : public dbRecord {
      * Number of columns in the table
      */
     nat4      nColumns;
-    
+
     /**
      * Identifier of first row in the table
      */
@@ -1140,56 +1141,56 @@ inline dbFieldDescriptor* dbDescribeRawField(dbFieldDescriptor* fd, dbUDTCompara
 
 
 template<class T>
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, T& x) 
-{ 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, T& x)
+{
     fd->type = fd->appType = dbField::tpStructure;
-    if ((fd->components = x.dbDescribeComponents(fd)) != NULL) { 
+    if ((fd->components = x.dbDescribeComponents(fd)) != NULL) {
         fd->elemSize = fd->components->dbsSize;
     }
     return fd;
 }
 
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, int1&) 
-{ 
-    fd->type = fd->appType = dbField::tpInt1; 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, int1&)
+{
+    fd->type = fd->appType = dbField::tpInt1;
     return fd;
 }
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, int2&) 
-{ 
-    fd->type = fd->appType = dbField::tpInt2; 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, int2&)
+{
+    fd->type = fd->appType = dbField::tpInt2;
     return fd;
 }
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, int4&) 
-{ 
-    fd->type = fd->appType = dbField::tpInt4; 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, int4&)
+{
+    fd->type = fd->appType = dbField::tpInt4;
     return fd;
 }
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, db_int8&) 
-{ 
-    fd->type = fd->appType = dbField::tpInt8; 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, db_int8&)
+{
+    fd->type = fd->appType = dbField::tpInt8;
     return fd;
 }
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, nat1&) 
-{ 
-    fd->type = fd->appType = dbField::tpInt1; 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, nat1&)
+{
+    fd->type = fd->appType = dbField::tpInt1;
     return fd;
 }
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, nat2&) 
-{ 
-    fd->type = fd->appType = dbField::tpInt2; 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, nat2&)
+{
+    fd->type = fd->appType = dbField::tpInt2;
     return fd;
 }
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, nat4&) 
-{ 
-    fd->type = fd->appType = dbField::tpInt4; 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, nat4&)
+{
+    fd->type = fd->appType = dbField::tpInt4;
     return fd;
 }
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, nat8&) 
-{ 
-    fd->type = fd->appType = dbField::tpInt8; 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, nat8&)
+{
+    fd->type = fd->appType = dbField::tpInt8;
     return fd;
 }
-#if SIZEOF_LONG != 8 
+#if SIZEOF_LONG != 8
 inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, long&)
 {
     fd->type = fd->appType = sizeof(long) == 4 ? dbField::tpInt4 : dbField::tpInt8;
@@ -1201,19 +1202,19 @@ inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, unsigned long&)
     return fd;
 }
 #endif
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, bool&) 
-{ 
-    fd->type = fd->appType = dbField::tpBool; 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, bool&)
+{
+    fd->type = fd->appType = dbField::tpBool;
     return fd;
 }
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, real4&) 
-{ 
-    fd->type = fd->appType = dbField::tpReal4; 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, real4&)
+{
+    fd->type = fd->appType = dbField::tpReal4;
     return fd;
 }
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, real8&) 
-{ 
-    fd->type = fd->appType = dbField::tpReal8; 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, real8&)
+{
+    fd->type = fd->appType = dbField::tpReal8;
     return fd;
 }
 inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, rectangle&)
@@ -1232,36 +1233,36 @@ inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, std::wstring&)
     return fd->setWStringType(dbField::tpStdWString);
 }
 #endif
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, char const*&) 
-{ 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, char const*&)
+{
     return fd->setStringType(dbField::tpString);
 }
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, char*&) 
-{ 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, char*&)
+{
     return fd->setStringType(dbField::tpString);
 }
 
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, wchar_t const*&) 
-{ 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, wchar_t const*&)
+{
     return fd->setWStringType(dbField::tpWString);
 }
-inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, wchar_t*&) 
-{ 
+inline dbFieldDescriptor* dbDescribeField(dbFieldDescriptor* fd, wchar_t*&)
+{
     return fd->setWStringType(dbField::tpWString);
 }
 
 
-/** 
+/**
  * Trampolinefor invocation of methods from SubSQL
  */
-class FASTDB_DLL_ENTRY dbAnyMethodTrampoline { 
+class FASTDB_DLL_ENTRY dbAnyMethodTrampoline {
   public:
     dbFieldDescriptor* cls;
 
     /**
      * Invoke method
      * @param data pointer to the record insode database
-     * @param result pointer to place result in 
+     * @param result pointer to place result in
      */
     virtual void invoke(byte* data, void* result) = 0;
 
@@ -1278,7 +1279,7 @@ class FASTDB_DLL_ENTRY dbAnyMethodTrampoline {
      * @param fd method descriptor
      */
     dbAnyMethodTrampoline(dbFieldDescriptor* fd) { cls = fd; }
-    
+
     void* operator new(size_t size EXTRA_DEBUG_NEW_PARAMS);
     void  operator delete(void* p EXTRA_DEBUG_NEW_PARAMS);
 
@@ -1287,7 +1288,7 @@ class FASTDB_DLL_ENTRY dbAnyMethodTrampoline {
      */
     virtual~dbAnyMethodTrampoline();
 };
-    
+
 
 #if defined(__APPLE__) || defined(__VACPP_MULTI__) || defined(__IBMCPP__) || defined(__HP_aCC) || (defined(__SUNPRO_CC) && __SUNPRO_CC >= 0x510 && __SUNPRO_CC_COMPAT == 5)
 /**
@@ -1303,15 +1304,15 @@ class dbMethodTrampoline : public dbAnyMethodTrampoline {
     bool               optimized;
 
     void invoke(byte* data, void* result) {
-        if (optimized) { 
+        if (optimized) {
             *(R*)result = (((T*)(data + this->cls->dbsOffs))->*method)();
-        } else { 
+        } else {
             T rec;
             this->cls->components->fetchRecordFields((byte*)&rec, data);
             *(R*)result = (rec.*method)();
         }
     }
-    dbAnyMethodTrampoline* optimize() { 
+    dbAnyMethodTrampoline* optimize() {
         optimized = true;
         return this;
     }
@@ -1331,7 +1332,7 @@ class dbMethodTrampoline : public dbAnyMethodTrampoline {
  * Template for method trampoline implementation
  */
 template<class T, class R>
-class dbMethodTrampoline : public dbAnyMethodTrampoline { 
+class dbMethodTrampoline : public dbAnyMethodTrampoline {
   public:
     typedef R (T::*mfunc)();
     mfunc method;
@@ -1341,9 +1342,9 @@ class dbMethodTrampoline : public dbAnyMethodTrampoline {
         *(R*)result = (rec.*method)();
     }
     dbAnyMethodTrampoline* optimize();
- 
-    dbMethodTrampoline(dbFieldDescriptor* fd, mfunc f) 
-    : dbAnyMethodTrampoline(fd), method(f) {} 
+
+    dbMethodTrampoline(dbFieldDescriptor* fd, mfunc f)
+    : dbAnyMethodTrampoline(fd), method(f) {}
 };
 
 
@@ -1352,37 +1353,37 @@ class dbMethodTrampoline : public dbAnyMethodTrampoline {
  * and use direct pointer to the record inside database
  */
 template<class T, class R>
-class dbMethodFastTrampoline : public dbAnyMethodTrampoline { 
+class dbMethodFastTrampoline : public dbAnyMethodTrampoline {
     typedef R (T::*mfunc)();
     mfunc method;
   public:
-    dbAnyMethodTrampoline* optimize() { 
+    dbAnyMethodTrampoline* optimize() {
         return this;
     }
     void invoke(byte* data, void* result) {
         *(R*)result = (((T*)(data + this->cls->dbsOffs))->*method)();
     }
-    dbMethodFastTrampoline(dbMethodTrampoline<T,R>* mt) 
+    dbMethodFastTrampoline(dbMethodTrampoline<T,R>* mt)
     : dbAnyMethodTrampoline(mt->cls), method(mt->method) {
         delete mt;
     }
 };
 
 template<class T, class R>
-inline dbAnyMethodTrampoline* dbMethodTrampoline<T,R>::optimize() { 
+inline dbAnyMethodTrampoline* dbMethodTrampoline<T,R>::optimize() {
     return new dbMethodFastTrampoline<T,R>(this);
 }
-    
+
 #endif
 
 template<class T, class R>
-inline dbFieldDescriptor* dbDescribeMethod(dbFieldDescriptor* fd, R (T::*p)()) 
-{ 
+inline dbFieldDescriptor* dbDescribeMethod(dbFieldDescriptor* fd, R (T::*p)())
+{
     R ret;
     dbDescribeField(fd, ret);
-    if (fd->type == dbField::tpWString) { 
+    if (fd->type == dbField::tpWString) {
         fd->appType = fd->type = dbField::tpMethodWString;
-    } else { 
+    } else {
         assert(fd->type <= dbField::tpReference);
         fd->appType = fd->type += dbField::tpMethodBool;
     }
