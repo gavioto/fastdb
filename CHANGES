@@ -2,17 +2,17 @@
 
 1. Make it possible sort records by length of array fields.
 
-2. Optional reporting database errors through C++ exception mechanism. 
+2. Optional reporting database errors through C++ exception mechanism.
    Switched on by defining THROW_EXCEPTION_ON_ERROR name.
 
 --- Release version 1.17 (11.10.1999) -------------------------------------
 
 1. Remove F_SYNC attribute of open() system call for database data file.
-   2.2.x Linux kernel works with memory regions mapped to the file opened 
-   in synchronous mode in very inefficient way (more than 20 times slower 
+   2.2.x Linux kernel works with memory regions mapped to the file opened
+   in synchronous mode in very inefficient way (more than 20 times slower
    than 2.0 Linux kernel). As far as synchronization of memory pages with
    disk image is done by msync() function with MS_SYNC flag, usage of F_SYNC
-   is not really needed. 
+   is not really needed.
 
 --- Release version 1.18 (14.10.1999) -------------------------------------
 
@@ -31,7 +31,7 @@
 1. Add get peer name method to the WWWapi.
 2. New implementation of cascade deletes.
 3. Implementation of queue manager for WWW API.
-4. New example of Web database publishing - CLIDB. 
+4. New example of Web database publishing - CLIDB.
    Example of multithreaded server development using queue manager.
 5. Add type of cursor parameter to the select statement.
 6. Support pointers to arrays as query parameters
@@ -51,7 +51,7 @@
 1. Handle "create table" in SubSQL.
 2. Add CLI (call-level interface).
 3. Multithreaded server support.
-4. Fix bug with in place update of records with varying components. 
+4. Fix bug with in place update of records with varying components.
 
 --- Release version 2.01 (18.02.2000) -------------------------------------
 
@@ -75,7 +75,7 @@
 --- Release version 2.05 (27.03.2000) -------------------------------------
 
 1. Indexed joins (see testjoin.cpp example)
-2. Fix bug with sorting/comparing field with smallest integer value 
+2. Fix bug with sorting/comparing field with smallest integer value
 
 --- Release version 2.06 (11.04.2000) -------------------------------------
 
@@ -102,9 +102,9 @@
 
 --- Release version 2.10 (21.07.2000) -------------------------------------
 
-1. Fix bug in local_win_socket::read 
+1. Fix bug in local_win_socket::read
 2. Fix memory leaks in CLI server
-3. Support GNU C library 
+3. Support GNU C library
 4. Fix bug in implementation of global critical section for i86/Linux platform
 5. Add isLast, isFirst methods to the cursor
 
@@ -133,7 +133,7 @@
 
 --- Release version 2.17 (19.03.2001) -------------------------------------
 
-1. Fix bug with scheme load. 
+1. Fix bug with scheme load.
 2. Sharing of tables between several databases.
 
 --- Release version 2.18 (05.04.2001) -------------------------------------
@@ -147,7 +147,7 @@
 
 --- Release version 2.20 (15.05.2001) -------------------------------------
 
-1. Revoked lock detection. 
+1. Revoked lock detection.
 
 --- Release version 2.21 (08.06.2001) -------------------------------------
 
@@ -187,7 +187,7 @@ by multiple threads.
 --- Release version 2.27 (09.09.2001) -------------------------------------
 
 1. Enable read access to the database during transaction commit
-2. Improved support of user defined types: now it is possible to use raw binary type in queries, 
+2. Improved support of user defined types: now it is possible to use raw binary type in queries,
 indices and sort clause.
 
 --- Release version 2.28 (11.09.2001) -------------------------------------
@@ -212,7 +212,7 @@ to work with databases created without this option and visa versa.
 
 --- Release version 2.32 (07.10.2001) -------------------------------------
 
-1. Preserve cursor consistency by automatic update of the current record in cursor when the 
+1. Preserve cursor consistency by automatic update of the current record in cursor when the
 object is updated (by other cursor or because of inverse reference propagation).
 2. Add nextAvaiable method to cursor.
 
@@ -242,7 +242,7 @@ object is updated (by other cursor or because of inverse reference propagation).
 
 --- Release version 2.37 (14.12.2001) -------------------------------------
 
-1. Fix bug with handling pasciiz type at server. 
+1. Fix bug with handling pasciiz type at server.
 2. Fix bug with rollback
 3. Fix problem with opening read-only files
 4. Support of disk-less configurations
@@ -251,13 +251,13 @@ object is updated (by other cursor or because of inverse reference propagation).
 --- Release version 2.38 (23.01.2002) -------------------------------------
 
 1. UPDATE statement in SubSQL
-2. Port to PharLap 
+2. Port to PharLap
 3. User defined functions with more than one argument and user defined operators.
 4. Optional use of Posix semaphres instead of SysV IPC mechanism.
 
 --- Release version 2.39 (09.02.2002) -------------------------------------
 
-1. Support "backup compactify" command in SubSQL which makes it possible 
+1. Support "backup compactify" command in SubSQL which makes it possible
 to perform database defragmentation.
 2. Fix bug in delayed trasnaction mode.
 
@@ -279,7 +279,7 @@ to perform database defragmentation.
 
 --- Release version 2.43 (04.04.2002) -------------------------------------
 
-1. Fix bug in query omptimizer introduced with user defined types (in some cases 
+1. Fix bug in query omptimizer introduced with user defined types (in some cases
 indices are not applied).
 2. Fix bug with multiprocess access to the database with DISKLESS_CONFIGURATION
 3. Fix bug with method descriptors.
@@ -312,7 +312,7 @@ indices are not applied).
 
 --- Release version 2.48 (09.08.2002) -------------------------------------
 
-1. Fix minor bug in backup method. 
+1. Fix minor bug in backup method.
 2. Repalce int8 type with db_int8
 
 --- Release version 2.49 (03.09.2002) -------------------------------------
@@ -330,10 +330,10 @@ indices are not applied).
 2. Make it possible to specify WHERE caluse in DELETE statement in SubSQL.
 3. Fix bugs in create_table/show_table methods in local CLI.
 4. Fix bug with accessing database by multiple processes.
- 
+
 --- Release version 2.52 (06.11.2002) -------------------------------------
 
-1. Concurrent read/update mode 
+1. Concurrent read/update mode
 2. Fix bug with delayed commit
 3. Fix problem with compilation under Solaris
 4. Add dbContainer class
@@ -355,7 +355,7 @@ indices are not applied).
 2. Add cli_create_table, cli_drop_table, cli_alter_index and cli_skip methods to CLI API
 3. Add selectByKey, selectByKeyRange and skip methods to dbCursor class
 4. Add more parameters to cli_create function
-5. Fix bug in dbDatabase::close which can cause incorrect resetting dirty flag in database 
+5. Fix bug in dbDatabase::close which can cause incorrect resetting dirty flag in database
 6. Make it possible to access standby replication node in read only mode
 7. Update all opened cursors when record is deleted
 8. Support "select count(*)" in SubSQL
@@ -366,7 +366,7 @@ indices are not applied).
 2. Ignore case of identifiers with IGNORE_CASE options
 3. Fix bug in cascade delete
 4. Add cli_freeze, cli_unfreeze functions
-5. Separate module for Borland C++/Delphi interface to FastDB impelmented by 
+5. Separate module for Borland C++/Delphi interface to FastDB impelmented by
 Serge Aleynikov <serge@hq.idt.net>
 
 --- Release version 2.56 (22.01.2003) -------------------------------------
@@ -411,7 +411,7 @@ Serge Aleynikov <serge@hq.idt.net>
 1. Add replication socket which allows CLI client to broadcast requests
 to multiple servers and gather+compare responses from them. With replication
 socket client can continue work with the database even in case of fault
-of one or more servers. Client will just do not notice the server fault. 
+of one or more servers. Client will just do not notice the server fault.
 2. Fix compilation bug in HArray for Visual C++ 6.0 and earlier
 
 --- Release version 2.63 (12.05.2003) -------------------------------------
@@ -423,21 +423,21 @@ and cli_get_database_state() function in CLI
 
 --- Release version 2.64 (15.05.2003) -------------------------------------
 
-1. HTML database browser. "start http server URL" command was added to SubSQL. 
-Once HTTP server is started, you can login to the specified URL from any Web browser, 
-view database tables and execute queries. 
+1. HTML database browser. "start http server URL" command was added to SubSQL.
+Once HTTP server is started, you can login to the specified URL from any Web browser,
+view database tables and execute queries.
 
 --- Release version 2.65 (28.05.2003) -------------------------------------
 
 1. Suuport arbitrary expression in order-by clause
 2. Fix bug with in SubSQL close method introduced in version 2.63
-3. Make it possible to output trace messages using OutputDebugString 
+3. Make it possible to output trace messages using OutputDebugString
 
 --- Release version 2.66 (03.06.2003) -------------------------------------
 
-1. Implement XML import/export in SubSQL 
+1. Implement XML import/export in SubSQL
 2. Fix bug with setting referenced table name in tables created by SubSQL and CLI
-3. Make it possible to define trace function and add cli_set_trace_function to CLI API. 
+3. Make it possible to define trace function and add cli_set_trace_function to CLI API.
 
 --- Release version 2.67 (04.06.2003) -------------------------------------
 
@@ -450,13 +450,13 @@ view database tables and execute queries.
 
 --- Release version 2.69 (18.06.2003) -------------------------------------
 
-1. Fix synchronization bug with accepting connections in CLI server 
-2. Fix the problem with unligned memory allocation in Borland C++ 
+1. Fix synchronization bug with accepting connections in CLI server
+2. Fix the problem with unligned memory allocation in Borland C++
 
 --- Release version 2.70 (24.06.2003) -------------------------------------
 
 1. Provide more convenient way to access database by local CLI:
-   add cli_prepare_query, cli_execute_query and cli_insert_struct functions. 
+   add cli_prepare_query, cli_execute_query and cli_insert_struct functions.
 
 --- Release version 2.71 (03.07.2003) -------------------------------------
 
@@ -467,7 +467,7 @@ view database tables and execute queries.
 --- Release version 2.72 (11.07.2003) -------------------------------------
 
 1. Support inverse references in SubSQL
-2. New sorting algorithm 
+2. New sorting algorithm
 
 --- Release version 2.73 (16.07.2003) -------------------------------------
 
@@ -484,7 +484,7 @@ number of objects exceeds 2**20
 
 1. Fix bug in global critical section implementation for Sys-V Unix.
 2. Fix bug in SubSQL parameter parsing
-3. Fix bug in dbHArray 
+3. Fix bug in dbHArray
 
 
 --- Release version 2.76 (12.09.2003) -------------------------------------
@@ -494,7 +494,7 @@ number of objects exceeds 2**20
 
 --- Release version 2.77 (26.09.2003) -------------------------------------
 1. New alignment rule for packing record fields. It should fix
-problems with alignment 8-byte fields at systems where malloc doesn't return 
+problems with alignment 8-byte fields at systems where malloc doesn't return
 address aligned at 8-bytes boundary.
 2. Refetch updated record in all openned cursors where this record is current.
 3. Eliminate method descriptors memory leak
@@ -504,7 +504,7 @@ address aligned at 8-bytes boundary.
 
 --- Release version 2.79 (17.10.2003) -------------------------------------
 1. Fix memory leak in construction of order by statement.
-2. Fix compilation problem with some GCC versions. 
+2. Fix compilation problem with some GCC versions.
 
 --- Release version 2.80 (29.10.2003) -------------------------------------
 1. Fix bug with static queries deallocation
@@ -573,10 +573,10 @@ Attention: it will require rebuild of all hash indices
 1. Fix memory leak in cli_bind_array function
 2. Port to Solaris/Sun Forte compiler
 3. Fix memory leaks in SubSQL
-4. Make it possible to specify format of printing datetime fields in SubSQL 
+4. Make it possible to specify format of printing datetime fields in SubSQL
 (SUBSQL_DATE_FORMAT environment variable)
 5. Change dbReplicatedDatabase::open method to support recovery from crash of all nodes
-6. Automatically detect failure of one or more database clients, revoke locks and recover database in 
+6. Automatically detect failure of one or more database clients, revoke locks and recover database in
 such case.
 7. Fix bug in openning database by multiple clients in Unix.
 
@@ -587,7 +587,7 @@ such case.
 4. Change allocate method to leave database in consistent stwate in case of
 throwing FileLimitExeeded exception.
 5. Add indexed prefix search: locate all records which indexed field is prefix of specified key.
-Such query can be written like this: "KEY like field+'%'", where KEY is either string literal, 
+Such query can be written like this: "KEY like field+'%'", where KEY is either string literal,
 either parameter and "field" - indexed field.
 
 --- Release version 2.97 26.04.2004 -------------------------------------
@@ -599,7 +599,7 @@ either parameter and "field" - indexed field.
 
 --- Release version 2.98 09.05.2004 -------------------------------------
 1. Support work with different number of node in replication model
-2. Fix bugs in dbContainer class 
+2. Fix bugs in dbContainer class
 3. Efficiently execute "current=ICONST" query
 
 --- Release version 2.99 28.05.2004 -------------------------------------
@@ -622,15 +622,15 @@ either parameter and "field" - indexed field.
 4. Add DLL configuration to Visual Studio project
 
 --- Release version 3.03 06.08.2004 -------------------------------------
-1. Optimized execution of IN operator 
+1. Optimized execution of IN operator
 2. Add CSharp CLI interface (implemented by Serge Aleynikov <serge@hq.idt.net>)
-3. Change dbCursor::remove() method to always move current position forward. 
+3. Change dbCursor::remove() method to always move current position forward.
 4. Add cleanupsem utility
 
 --- Release version 3.04 21.08.2004 -------------------------------------
-1. Fix compilation problem with cleanupsem at some Unix dialect. 
+1. Fix compilation problem with cleanupsem at some Unix dialect.
 2. Make it possible to alter initial value of autoincrement fields before
-   database open. 
+   database open.
 
 --- Release version 3.05 02.10.2004 -------------------------------------
 1. Fix problem with not resetting cursor in cli_fetch method
@@ -642,13 +642,13 @@ either parameter and "field" - indexed field.
 
 --- Release version 3.07 14.11.2004 -------------------------------------
 1. Add DTD in exported XML file
-2. Optimize LIKE operator 
+2. Optimize LIKE operator
 3. Fix bug in XML array import
 
 --- Release version 3.08 28.11.2004 -------------------------------------
-1. Fix problem with local CLI at Unix (application is hanged in cli_close if 
+1. Fix problem with local CLI at Unix (application is hanged in cli_close if
 there are opened statements because of repeated lock of non-reentrant pthread mutex).
-2. Fix bug in implementation of indexed inverse reference (inverse reference update doesn't 
+2. Fix bug in implementation of indexed inverse reference (inverse reference update doesn't
 update index)
 3. Optimized version of hash index (more efficient hash function for scalar types)
 
@@ -674,7 +674,7 @@ update index)
 4. Add support of "LIMIT" clause in queries
 
 --- Release version 3.13 18.04.2005 -------------------------------------
-1. Fix possible race condition problem for clearing dirty flag when more than one 
+1. Fix possible race condition problem for clearing dirty flag when more than one
 processes working concurrently with database in dbConcurrentUpdateMode
 2. Fix bug in optimization of "like '%xyz%'" operator
 3. Add dbDatabase::backup(dbFile* file, bool compactify) method
@@ -690,8 +690,8 @@ to allow user defined implementations of backup media.
 2. Fix bug in SubSQL update statement
 
 --- Release version 3.16 27.05.2005 -------------------------------------
-1. Implement fuzzy checkpoint. When FUZZY_CHECKPOINT is defined in config.h 
-changes done by transaction are written to the disk asynchronously by separate thread. 
+1. Implement fuzzy checkpoint. When FUZZY_CHECKPOINT is defined in config.h
+changes done by transaction are written to the disk asynchronously by separate thread.
 It allows to minimize time of exclusive locking of database by update transaction.
 
 --- Release version 3.17 29.06.2005 -------------------------------------
@@ -708,7 +708,7 @@ It allows to minimize time of exclusive locking of database by update transactio
 --- Release version 3.19 01.08.2005 -------------------------------------
 1. Fix bug with duplicated autoincremented field values in case of transaction rollback.
 2. Add dbDatabase::prepareQuery method
-3. Fix problem with dependency on the order of operands calculation which cause crash of 
+3. Fix problem with dependency on the order of operands calculation which cause crash of
 FastDB during database reallocation when FastDB is built with GCC 3.2 or higher.
 
 --- Release version 3.20 28.08.2005 -------------------------------------
@@ -717,7 +717,7 @@ FastDB during database reallocation when FastDB is built with GCC 3.2 or higher.
 --- Release version 3.21 28.08.2005 -------------------------------------
 1. Add RECOVERABLE_CRITICAL_SECTION configuration option. This mode can be used instead of
 AUTO_DETECT_PROCESS_CRASH to perform recovery after crash of one of FastDB applications.
-Unlike AUTO_DETECT_PROCESS_CRASH it doesn't create watch-dog mutexes and start threads 
+Unlike AUTO_DETECT_PROCESS_CRASH it doesn't create watch-dog mutexes and start threads
 waiting on this mutexes. Detection of process crash and revoking of the lock hold by this process
 is performed by operating system. Recovery of database is possible only for dbConcurrentUpdate mode.
 2. Derive exception class from std::exception
@@ -737,7 +737,7 @@ is performed by operating system. Recovery of database is possible only for dbCo
 6. Support classnames with package names in Java JNI CLI constraint parser
 7. Correctly handle autoincremented fields in local CLI API.
 8. Fix problem with handling compound table names produced from Java class in SubSQL insert and delete statements
-9. Fix array component access bug in JNICLI 
+9. Fix array component access bug in JNICLI
 10. Support inverse reference field declaration in JNICLI table constraints
 11. Fix bug with throwing exceptions in JNICLI
 
@@ -848,7 +848,7 @@ provides the same behavior
 --- Release version 3.41 22.10.2007 -------------------------------------
 1. Fix bug in dbSelection::truncate which may cause crash of queries with LIMIT clause
 2. Fix bug with uninitialized parser variable while compiling expressions in SubSQL update statement.
-3. Use namespace prefix in KEY, TYPE_DESCRIPTOR, REGISTER... macro definitions to make it possible to use 
+3. Use namespace prefix in KEY, TYPE_DESCRIPTOR, REGISTER... macro definitions to make it possible to use
    them without "use namespace" statement.
 
 --- Release version 3.42 08.11.2007 -------------------------------------
@@ -861,7 +861,7 @@ provides the same behavior
 2. Fix bug in dbLocalSemaphore::signal method
 3. Add dbDatabase::formatErrorMessage and dbDatabase::fatalError method for more convenient
    error handling
-4. Fix problem in delayed transaction commit (it may commit transactions more frequently than 
+4. Fix problem in delayed transaction commit (it may commit transactions more frequently than
 requested even if database is access by one thread)
 5. Support master restart with online replicas
 
@@ -872,20 +872,20 @@ requested even if database is access by one thread)
 4. Add dbArray::bsearch method
 5. Add PAD_HEADER macro to make it possible to preserve compatibility with databases
    created by FastDB versions 3.17-3.38
-6. Make it possible to specify "/dev/zero" as database file path at Windows to 
+6. Make it possible to specify "/dev/zero" as database file path at Windows to
    create diskless daatbase without rebuilding FastDB with DISKLESS_MODE defined.
 7. Fix bug in configuration with namespaces.
 
 
 --- Release version 3.45 14.02.2008 -------------------------------------
-1. Move XML import/export from SubSQL to dbDatabase class, 
+1. Move XML import/export from SubSQL to dbDatabase class,
    allowing embedded application to use these methods generating/parsing XML.
 2. Optimized version of dbDatabase::findTableByName using hash table.
 3. Fix memory leak in dbFileWriter used in fuzzy checkpoint mode
 
 --- Release version 3.46 02.03.2008 -------------------------------------
 1. Add macros for registered class with namespace prefix
-2. Fix bug in dbCursor::removeAllSelected 
+2. Fix bug in dbCursor::removeAllSelected
 3. Fix bug in fixed size allocator
 
 --- Release version 3.47 18.03.2008 -------------------------------------
@@ -895,7 +895,7 @@ requested even if database is access by one thread)
 
 --- Release version 3.48 08.05.2008 -------------------------------------
 1. Port to VxWorks performed by "Szekely, Itay" <Itay.Szekely@lsi.com>
-2. Fix problem with importing std::strings 
+2. Fix problem with importing std::strings
 
 --- Release version 3.49 26.06.2008 -------------------------------------
 1. Add rename field command to SubSQL
@@ -979,7 +979,7 @@ that not all fields are described was produced incorrectly)
 
 --- Release version 3.63 24.07.2010 -------------------------------------
 1. Add dbFile::force_read flag to force sequential reading of the whole database file in memory.
-2. Borland C++ compatibility fixes 
+2. Borland C++ compatibility fixes
 3. Fix bug in alter schema CLI function
 
 --- Release version 3.64 23.08.2010 -------------------------------------
@@ -1039,3 +1039,7 @@ that not all fields are described was produced incorrectly)
 
 --- Release version 3.76 ??.02.2014 -------------------------------------
 1. Add cli_open_force_read and cli_open_no_sync flags
+
+--- Release version 3.77 ??.04.2014 -------------------------------------
+1. Support iteration through neigbors using R-Tree index:
+select * from t order by distance(r,(5,5));

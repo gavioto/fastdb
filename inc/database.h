@@ -49,18 +49,18 @@ const int dbDefaultParallelScanThreshold = 1000;
 const int dbDefaultPollInterval = 10*1000; // milliseconds
 const int dbOpenPollInterval = 1000; // milliseconds
 const int dbWaitReadyTimeout = 60*1000; // milliseconds
-const int dbWaitStatusTimeout = 60*1000; // milliseconds 
-const int dbRecoveryConnectionAttempts = 3; 
+const int dbWaitStatusTimeout = 60*1000; // milliseconds
+const int dbRecoveryConnectionAttempts = 3;
 const int dbStartupConnectionAttempts = 60;
-const int dbReplicationWriteTimeout = 60*1000; // milliseconds 
-const int dbMaxAsyncRecoveryIterations = 10;   
-const int dbTableHashSize = 1009;   
+const int dbReplicationWriteTimeout = 60*1000; // milliseconds
+const int dbMaxAsyncRecoveryIterations = 10;
+const int dbTableHashSize = 1009;
 
 /**
  * Internal objects tags
  */
-enum dbInternalObject { 
-    dbTableRow, 
+enum dbInternalObject {
+    dbTableRow,
     dbPageObjectMarker,
     dbTtreeMarker,
     dbTtreeNodeMarker,
@@ -68,11 +68,11 @@ enum dbInternalObject {
     dbHashTableItemMarker,
     dbRtreeMarker,
     dbRtreePageMarker,
-    
+
     dbInternalObjectMarker = 7 // mask for internals object markers
 };
-    
-const offs_t dbFreeHandleMarker = (offs_t)1 << (sizeof(offs_t)*8 - 1); 
+
+const offs_t dbFreeHandleMarker = (offs_t)1 << (sizeof(offs_t)*8 - 1);
 
 const size_t dbAllocationQuantumBits = 4;
 const size_t dbAllocationQuantum = 1 << dbAllocationQuantumBits;
@@ -100,9 +100,9 @@ const size_t dbAllocRecursionLimit = 10;
 /**
  * Predefined object identifiers
  */
-enum dbPredefinedIds { 
+enum dbPredefinedIds {
     dbInvalidId,
-    dbMetaTableId, 
+    dbMetaTableId,
     dbBitmapId,
     dbFirstUserId = dbBitmapId + dbBitmapPages
 };
@@ -110,7 +110,7 @@ enum dbPredefinedIds {
 /**
  * Database header
  */
-class dbHeader { 
+class dbHeader {
   public:
     offs_t size;  // database file size
     int4   curr;  // current root
@@ -119,21 +119,21 @@ class dbHeader {
 #if (dbDatabaseOffsetBits > 32 && defined(ALIGN_HEADER)) || defined(PAD_HEADER)
     int4   pad;
 #endif
-    struct { 
+    struct {
         offs_t index;           // offset to object index
         offs_t shadowIndex;     // offset to shadow index
         oid_t  indexSize;       // size of object index
         oid_t  shadowIndexSize; // size of object index
-        oid_t  indexUsed;       // used part of the index   
+        oid_t  indexUsed;       // used part of the index
         oid_t  freeList;        // L1 list of free descriptors
     } root[2];
-    
+
     int4 majorVersion;
     int4 minorVersion;
     int4 mode;
-    offs_t used;  
+    offs_t used;
 
-    enum { 
+    enum {
         MODE_OID_64        = 0x01,
         MODE_OFFS_64       = 0x02,
         MODE_AUTOINCREMENT = 0x04,
@@ -145,12 +145,12 @@ class dbHeader {
         MODE_PAD_HEADER    = 0x100,
         MODE_REPLICATION   = 0x200,
         MODE_RECTANGLE_DIM = 0x10000
-    };    
+    };
 
-    int getVersion() { 
+    int getVersion() {
         return majorVersion*100 + minorVersion;
     }
-    
+
     bool isCompatible();
     int getCurrentMode();
 };
@@ -161,8 +161,9 @@ class dbDatabaseThreadContext;
 class dbAnyCursor;
 class dbQuery;
 class dbExprNode;
+class dbSearchContext;
 
-struct dbMemoryStatistic { 
+struct dbMemoryStatistic {
     offs_t used;
     offs_t free;
     offs_t nHoles;
@@ -173,7 +174,7 @@ struct dbMemoryStatistic {
 
 class FixedSizeAllocator
 {
-    struct Hole { 
+    struct Hole {
         Hole*  next;
         offs_t offs;
     };
@@ -194,28 +195,28 @@ class FixedSizeAllocator
 
     FixedSizeAllocator();
     ~FixedSizeAllocator();
-       
+
     void init(size_t minSize, size_t maxSize, size_t quantum, size_t bufSize);
     void reset();
 
-    offs_t allocate(size_t size) { 
-        if (size - minSize <= maxSize - minSize) { 
+    offs_t allocate(size_t size) {
+        if (size - minSize <= maxSize - minSize) {
             size_t i = (size - minSize + quantum - 1) / quantum;
             Hole* hole = chains[i];
-            if (hole != NULL) { 
+            if (hole != NULL) {
                 hits += 1;
                 chains[i] = hole->next;
                 hole->next = vacant;
                 vacant = hole;
                 return hole->offs;
-            }            
+            }
             faults += 1;
         }
         return 0;
     }
-    
-    bool deallocate(offs_t offs, size_t size) { 
-        if (vacant != NULL && size - minSize <= maxSize - minSize) {             
+
+    bool deallocate(offs_t offs, size_t size) {
+        if (vacant != NULL && size - minSize <= maxSize - minSize) {
             size_t i = (size - minSize + quantum - 1) / quantum;
             Hole* hole = vacant;
             vacant = hole->next;
@@ -225,11 +226,11 @@ class FixedSizeAllocator
             return true;
         }
         return false;
-    }   
+    }
 };
 
 
-class dbMonitor { 
+class dbMonitor {
   public:
     sharedsem_t sem;
     sharedsem_t mutatorSem;
@@ -243,7 +244,7 @@ class dbMonitor {
     int  backupInProgress;
     int  uncommittedChanges;
 
-    int  curr;             // copy of header->root, used to allow read access 
+    int  curr;             // copy of header->root, used to allow read access
                            // to the database during transaction commit
     offs_t size; // database size
 
@@ -252,8 +253,8 @@ class dbMonitor {
 
     unsigned lastDeadlockRecoveryTime;
 
-    int  version; 
-    int  users;  
+    int  version;
+    int  users;
 
     dbProcessId ownerPid;
 
@@ -269,7 +270,7 @@ class dbMonitor {
     int  modified;
 
 #ifdef DO_NOT_REUSE_OID_WITHIN_SESSION
-    struct { 
+    struct {
         oid_t head;
         oid_t tail;
     } sessionFreeList[2];
@@ -277,50 +278,50 @@ class dbMonitor {
 };
 
 /**
- * Double linked list 
+ * Double linked list
  */
-class FASTDB_DLL_ENTRY dbL2List { 
+class FASTDB_DLL_ENTRY dbL2List {
   public:
-    dbL2List* next; 
-    dbL2List* prev; 
+    dbL2List* next;
+    dbL2List* prev;
 
-    void link(dbL2List* elem) { 
+    void link(dbL2List* elem) {
         elem->prev = this;
         elem->next = next;
         next = next->prev = elem;
     }
-    void unlink() { 
+    void unlink() {
         next->prev = prev;
         prev->next = next;
         next = prev = this;
     }
-    bool isEmpty() { 
+    bool isEmpty() {
         return next == this;
     }
-    void reset() { 
-        next = prev = this;
-    }        
-    dbL2List() { 
+    void reset() {
         next = prev = this;
     }
-    ~dbL2List() { 
+    dbL2List() {
+        next = prev = this;
+    }
+    ~dbL2List() {
         unlink();
     }
 };
 
 class dbVisitedObject {
-  public: 
+  public:
     dbVisitedObject* next;
     oid_t            oid;
 
-    dbVisitedObject(oid_t oid, dbVisitedObject* chain) {         
+    dbVisitedObject(oid_t oid, dbVisitedObject* chain) {
         this->oid = oid;
         next = chain;
     }
 };
-    
+
 #ifdef AUTO_DETECT_PROCESS_CRASH
-struct dbWatchDogContext : dbL2List { 
+struct dbWatchDogContext : dbL2List {
     dbThread    thread;
     dbWatchDog  watchDog;
     long        clientId;
@@ -332,15 +333,15 @@ struct dbWatchDogContext : dbL2List {
 /**
  * Abstract interface for logging transaction
  */
-class FASTDB_DLL_ENTRY dbTransactionLogger 
+class FASTDB_DLL_ENTRY dbTransactionLogger
 {
   public:
     /**
      * Insert new object
      * @param table descriptor of table in which object is inserted
      * @param oid object identifier
-     * @param dbsObj database (packed) object body 
-     * @param appObj application object body 
+     * @param dbsObj database (packed) object body
+     * @param appObj application object body
      * @return true if insert is approved, false otherwise
      */
     virtual bool insert(dbTableDescriptor* table, oid_t oid, dbRecord const* dbsObj, void const* appObj) = 0;
@@ -349,8 +350,8 @@ class FASTDB_DLL_ENTRY dbTransactionLogger
      * Update object
      * @param table descriptor of table
      * @param oid object identifier
-     * @param dbsObj database (packed) object body 
-     * @param appObj application object body 
+     * @param dbsObj database (packed) object body
+     * @param appObj application object body
      * @return true if update is approved, false otherwise
      */
     virtual bool update(dbTableDescriptor* table, oid_t oid, dbRecord const* dbsObj, void const* appObj) = 0;
@@ -364,13 +365,13 @@ class FASTDB_DLL_ENTRY dbTransactionLogger
     virtual bool remove(dbTableDescriptor* table, oid_t oid) = 0;
 
     /**
-     * Perform first phase of transaction commit 
+     * Perform first phase of transaction commit
      * @return true if commit is approved, false otherwise
      */
     virtual bool commitPhase1() = 0;
 
     /**
-     * Perform second phase of transaction commit 
+     * Perform second phase of transaction commit
      */
     virtual void commitPhase2() = 0;
 
@@ -394,10 +395,10 @@ class FASTDB_DLL_ENTRY dbFileTransactionLogger : public dbTransactionLogger
     bool   crc;
 
     /**
-     * Operation with objects 
+     * Operation with objects
      */
     enum OperationKind {
-        opInsert, 
+        opInsert,
         opUpdate,
         opRemove
     };
@@ -415,21 +416,21 @@ class FASTDB_DLL_ENTRY dbFileTransactionLogger : public dbTransactionLogger
 
     dbFileTransactionLogger();
     virtual~dbFileTransactionLogger();
-    
+
 
     /**
      * Open transaction logger
      * @param path path to the transaction log file
      * @param flags dbFile::OpenFlags. Use dbFile::truncate flag to start new log
      * @param crc whether to caclulate CRC for transaction body or not
-     */    
+     */
     bool open(char_t const* path, int flags = dbFile::no_sync, bool crc = true);
-    
+
     /**
      * Close transaction log
      */
     void close();
-    
+
     enum RestoreStatus
     {
         rsOK,
@@ -448,7 +449,7 @@ class FASTDB_DLL_ENTRY dbFileTransactionLogger : public dbTransactionLogger
     RestoreStatus restore(dbDatabase& db, size_t& nTrans);
 };
 
-template<class T> 
+template<class T>
 class dbHArray;
 
 class dbXmlContext;
@@ -457,8 +458,8 @@ class dbXmlScanner;
 /**
  * Database class
  */
-class FASTDB_DLL_ENTRY dbDatabase 
-{ 
+class FASTDB_DLL_ENTRY dbDatabase
+{
     friend class dbSelection;
     friend class dbAnyCursor;
     friend class dbHashTable;
@@ -467,7 +468,7 @@ class FASTDB_DLL_ENTRY dbDatabase
     friend class dbTtreeNode;
     friend class dbRtree;
     friend class dbRtreePage;
-    friend class dbParallelQueryContext; 
+    friend class dbParallelQueryContext;
     friend class dbServer;
     friend class dbColumnBinding;
     friend class dbUserFunctionArgument;
@@ -478,7 +479,7 @@ class FASTDB_DLL_ENTRY dbDatabase
     friend class GiSTdb;
 
 #ifdef HAS_TEMPLATE_FRIENDS
-    template<class T> 
+    template<class T>
     friend class dbHArray;
 #else
     friend class dbAnyHArray;
@@ -488,18 +489,18 @@ class FASTDB_DLL_ENTRY dbDatabase
     /**
      * Open database
      * @param databaseName database name
-     * @param fileName path to the database file 
+     * @param fileName path to the database file
      *   (if null, then file name daatbaseName + ".fdb" will be used)
      * @param waitLockTimeoutMsec timeout for waiting locks, by default disabled
      * @param commitDelaySec delayed commit timeout, by default disabled
      * @return <code>true</code> if database was successfully opened
      */
-    bool open(char_t const* databaseName, 
-              char_t const* fileName = NULL, 
-              time_t waitLockTimeoutMsec = INFINITE, 
+    bool open(char_t const* databaseName,
+              char_t const* fileName = NULL,
+              time_t waitLockTimeoutMsec = INFINITE,
               time_t commitDelaySec = 0);
 
-    enum dbAccessType { 
+    enum dbAccessType {
         dbReadOnly,
         dbAllAccess,
         dbConcurrentRead,
@@ -509,9 +510,9 @@ class FASTDB_DLL_ENTRY dbDatabase
     /**
      * Structure to specify database open parameters
      */
-    struct OpenParameters { 
+    struct OpenParameters {
         /**
-         * Database name 
+         * Database name
          */
         char_t const* databaseName;
 
@@ -519,7 +520,7 @@ class FASTDB_DLL_ENTRY dbDatabase
          * Database file path
          */
         char_t const* databaseFilePath;
-        
+
         /**
          * Transaction commit delay
          */
@@ -541,22 +542,22 @@ class FASTDB_DLL_ENTRY dbDatabase
         size_t initSize;
 
         /**
-         * Quantum for extending memory allocation bitmap 
+         * Quantum for extending memory allocation bitmap
          */
         size_t extensionQuantum;
-            
+
         /**
          * Initial database index size
          */
         size_t initIndexSize;
 
         /**
-         * Concurrency level for sequential search and sort operations 
+         * Concurrency level for sequential search and sort operations
          */
         int nThreads;
 
         /**
-         * Threshold for amount of deallocated space after which allocation bitmap is 
+         * Threshold for amount of deallocated space after which allocation bitmap is
          * scanned from the very beginning reusing deallocated object
          */
         offs_t freeSpaceReuseThreshold;
@@ -580,9 +581,9 @@ class FASTDB_DLL_ENTRY dbDatabase
          * Number of nodes in replicasted database
          */
         int nNodes;
-        
+
         /**
-         * Interval of polling nodes 
+         * Interval of polling nodes
          */
         int pollInterval; // milliseconds
 
@@ -594,12 +595,12 @@ class FASTDB_DLL_ENTRY dbDatabase
         /**
          * Timeout of requesting status of other nodes during startup
          */
-        int waitStatusTimeout; // milliseconds 
+        int waitStatusTimeout; // milliseconds
 
         /**
          * Maximal number of attempts to establish with other nodes during recovery
          */
-        int recoveryConnectionAttempts; 
+        int recoveryConnectionAttempts;
 
         /**
          * Maximal number of attempts to establish with other nodes at startup
@@ -608,7 +609,7 @@ class FASTDB_DLL_ENTRY dbDatabase
 
         /**
          * Timeout of writing to replication node.
-         * If write can not be completed within specified timeout, then node is considered to be dead 
+         * If write can not be completed within specified timeout, then node is considered to be dead
          * and connection is hanged up.
          */
         int replicationWriteTimeout;
@@ -626,7 +627,7 @@ class FASTDB_DLL_ENTRY dbDatabase
          */
         int fileOpenFlags;
 
-        OpenParameters() { 
+        OpenParameters() {
             databaseName = NULL;
             databaseFilePath = NULL;
             transactionCommitDelay = 0;
@@ -644,11 +645,11 @@ class FASTDB_DLL_ENTRY dbDatabase
             pollInterval = dbDefaultPollInterval;
             waitReadyTimeout = dbWaitReadyTimeout;
             waitStatusTimeout = dbWaitStatusTimeout;
-            recoveryConnectionAttempts = dbRecoveryConnectionAttempts; 
+            recoveryConnectionAttempts = dbRecoveryConnectionAttempts;
             startupConnectionAttempts = dbStartupConnectionAttempts;
             replicationWriteTimeout = dbReplicationWriteTimeout;
-            maxAsyncRecoveryIterations = dbMaxAsyncRecoveryIterations;   
-            fileOpenFlags = 0; 
+            maxAsyncRecoveryIterations = dbMaxAsyncRecoveryIterations;
+            fileOpenFlags = 0;
         }
     };
 
@@ -669,12 +670,12 @@ class FASTDB_DLL_ENTRY dbDatabase
      */
     void commit();
 
-    /** 
-     * Release all locks hold by transaction allowing other clients to proceed 
+    /**
+     * Release all locks hold by transaction allowing other clients to proceed
      * but do not flush changes to the disk
      */
     void precommit();
-    
+
     /**
      * Rollback transaction
      */
@@ -687,22 +688,22 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @param periodSec period of performing backups in seconds
      */
     void scheduleBackup(char_t const* fileName, time_t periodSec);
-    
+
     /**
      * Attach current thread to the database. This method should be executed
      * for all threads except one which opened the database.
      */
     void attach();
-    
+
     /**
-     * Set transaction context for the current thread. Using this method allows to share the same transaction 
+     * Set transaction context for the current thread. Using this method allows to share the same transaction
      * between different threads
      * @param ctx transaction context which will be associated with the current thread
      */
     void attach(dbDatabaseThreadContext* ctx);
 
 
-    enum DetachFlags { 
+    enum DetachFlags {
         COMMIT          = 1,
         DESTROY_CONTEXT = 2
     };
@@ -712,8 +713,8 @@ class FASTDB_DLL_ENTRY dbDatabase
      */
     void detach(int flags = COMMIT|DESTROY_CONTEXT);
 
-    enum dbLockType { 
-        dbSharedLock, 
+    enum dbLockType {
+        dbSharedLock,
         dbExclusiveLock,
         dbCommitLock
     };
@@ -726,41 +727,41 @@ class FASTDB_DLL_ENTRY dbDatabase
     /**
      * Perform backup to the file with specified name
      * @param file path to the backup file
-     * @param compactify if true then databae will be compactificated during backup - 
-     * i.e. all used objects will be placed together without holes; if false then 
+     * @param compactify if true then databae will be compactificated during backup -
+     * i.e. all used objects will be placed together without holes; if false then
      * backup is performed by just writting memory mapped object to the backup file.
      * @return whether backup was succeseful or not
      */
     bool backup(char_t const* file, bool compactify);
-    
+
     /**
      * Perform backup to the specified file
      * @param file opened file to path to the backup file. This file will not be closed after
-     * backup completion. 
-     * @param compactify if true then databae will be compactificated during backup - 
-     * i.e. all used objects will be placed together without holes; if false then 
+     * backup completion.
+     * @param compactify if true then databae will be compactificated during backup -
+     * i.e. all used objects will be placed together without holes; if false then
      * backup is performed by just writting memory mapped object to the backup file.
      * @return whether backup was succeseful or not
      */
     bool backup(dbFile* file, bool compactify);
-    
+
     /**
      * Assign table to the database
      * @param desc table descriptor
      */
-    void assign(dbTableDescriptor& desc) { 
-        assert(((void)"Table is not yet assigned to the database", 
+    void assign(dbTableDescriptor& desc) {
+        assert(((void)"Table is not yet assigned to the database",
                 desc.tableId == 0));
-        desc.db = this; 
+        desc.db = this;
         desc.fixedDatabase = true;
     }
 
     /**
-     * Set concurrency level for sequential search and sort operations. 
+     * Set concurrency level for sequential search and sort operations.
      * By default, FastDB tries to detect number of CPUs in system and create
      * the same number of threads.
-     * @param nThreads maximal number of threads to be created for 
-     * perfroming cincurrent sequential search and sorting. 
+     * @param nThreads maximal number of threads to be created for
+     * perfroming cincurrent sequential search and sorting.
      */
     void setConcurrency(unsigned nThreads);
 
@@ -782,19 +783,19 @@ class FASTDB_DLL_ENTRY dbDatabase
      */
     size_t getUsedDatabaseSize() { return header->used; }
 
-    /** 
+    /**
      * Get number of threads accessing database in shared mode (readonly)
      * @return number of granted shared locks
      */
-    int getNumberOfReaders() { 
+    int getNumberOfReaders() {
         return monitor->nReaders;
     }
 
-    /** 
+    /**
      * Get number of threads accessing database in exclusiveh mode (for update)
      * @return number of granted exclusive locks (can be either 0 either 1)
      */
-    int getNumberOfWriters() { 
+    int getNumberOfWriters() {
         return monitor->nWriters;
     }
 
@@ -802,7 +803,7 @@ class FASTDB_DLL_ENTRY dbDatabase
      * Get number of threads blocked while starting read-only transaction
      * @return number of threads which shared lock request was blocked
      */
-    int getNumberOfBlockedReaders() { 
+    int getNumberOfBlockedReaders() {
         return monitor->nReaders;
     }
 
@@ -810,7 +811,7 @@ class FASTDB_DLL_ENTRY dbDatabase
      * Get number of threads blocked while starting update transaction
      * @return number of threads which exclusive lock request was blocked
      */
-    int getNumberOfBlockedWriters() { 
+    int getNumberOfBlockedWriters() {
         return monitor->nWriters;
     }
 
@@ -818,29 +819,29 @@ class FASTDB_DLL_ENTRY dbDatabase
      * Get number of processes attached to the database
      * @return number of processes openned the database
      */
-    int getNumberOfUsers() { 
+    int getNumberOfUsers() {
         return monitor->users;
     }
 
     /**
      * Enable deletion of columns from the table when correspondent fields
-     * are renamed from class descriptor. By default it is switched of 
-     * and database allows to delete fields only from empty table (to prevent 
-     * unindented loose of data). 
-     * @param enabled true to enable column deletion in non empty tables 
+     * are renamed from class descriptor. By default it is switched of
+     * and database allows to delete fields only from empty table (to prevent
+     * unindented loose of data).
+     * @param enabled true to enable column deletion in non empty tables
      */
-    void allowColumnsDeletion(bool enabled = true) { 
+    void allowColumnsDeletion(bool enabled = true) {
         confirmDeleteColumns = enabled;
     }
 
     /**
      * Enable or disable cascade for relations with ownership (declared using OWNER macro)
      * By default when owner record is deleted then all members of relation are also deleted.
-     * Also member of relation is deleted when owner of relation is updated and this member 
+     * Also member of relation is deleted when owner of relation is updated and this member
      * is not present in the list any more
      * @param enabled true to enable cascade delete, false to disable it
       */
-    void enableCascadeDelete(bool enabled = true) { 
+    void enableCascadeDelete(bool enabled = true) {
         cascadeDelete = enabled;
     }
 
@@ -848,12 +849,12 @@ class FASTDB_DLL_ENTRY dbDatabase
      * Enable or disable automatic update of inverse references
      * @param enabled true to enable  automatic update of inverse references, false to disable it
       */
-    void enableInverseReferencesUpdate(bool enabled = true) { 
+    void enableInverseReferencesUpdate(bool enabled = true) {
         inverseReferencesUpdate = enabled;
     }
 
     /**
-     * Prepare query. This method can be used for explicit compilation of query and 
+     * Prepare query. This method can be used for explicit compilation of query and
      * it's validation
      * @param cursor result set
      * @param query query expression
@@ -861,8 +862,8 @@ class FASTDB_DLL_ENTRY dbDatabase
      */
     bool prepareQuery(dbAnyCursor* cursor, dbQuery& query);
 
-    enum dbErrorClass { 
-        NoError, 
+    enum dbErrorClass {
+        NoError,
         QueryError,
         ArithmeticError,
         IndexOutOfRangeError,
@@ -883,7 +884,7 @@ class FASTDB_DLL_ENTRY dbDatabase
         RejectedByTransactionLogger
     };
     static char const* const errorMessage[];
-    typedef void (*dbErrorHandler)(int error, char const* msg, int msgarg, void* context); 
+    typedef void (*dbErrorHandler)(int error, char const* msg, int msgarg, void* context);
 
     /**
      * Set error handler. Handler should be no-return function which perform stack unwind.
@@ -906,9 +907,9 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @param error class of the error
      * @param msg error message
      * @param arg optional argument
-     */    
-    virtual void handleError(dbErrorClass error, char const* msg = NULL, 
-                             int arg = 0); 
+     */
+    virtual void handleError(dbErrorClass error, char const* msg = NULL,
+                             int arg = 0);
 
     /**
      * Format error message
@@ -917,8 +918,8 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @param error class of the error
      * @param msg error message
      * @param arg optional argument
-     */    
-    virtual void formatErrorMessage(char* buf, size_t bufSize, dbErrorClass error, char const* msg = NULL, int arg = 0); 
+     */
+    virtual void formatErrorMessage(char* buf, size_t bufSize, dbErrorClass error, char const* msg = NULL, int arg = 0);
 
     /**
      * Abort execution of application. In not redefined in derived class, this method is calls standard C runtime abort()
@@ -931,7 +932,7 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @param ref   [out] pointer to the references where ID of created object will be stored
      * @param record pointer to the transient object to be inserted in the table
      */
-    void insertRecord(dbTableDescriptor* table, dbAnyReference* ref, 
+    void insertRecord(dbTableDescriptor* table, dbAnyReference* ref,
                       void const* record);
 
     /**
@@ -968,7 +969,7 @@ class FASTDB_DLL_ENTRY dbDatabase
      * Specify database file size limit. Attempt to exeed this limit cause database error.
      * @param limit maximal file size in bytes
      */
-    void setFileSizeLimit(size_t limit) { 
+    void setFileSizeLimit(size_t limit) {
         fileSizeLimit = limit;
     }
 
@@ -978,7 +979,7 @@ class FASTDB_DLL_ENTRY dbDatabase
      * If this limit is reached, commit is blocked until some of the requests are proceeded
      * @param nPages maximal number of pages in write queue
      */
-    void setFuzzyCheckpointBuffer(size_t nPages) { 
+    void setFuzzyCheckpointBuffer(size_t nPages) {
         file.setCheckpointBufferSize(nPages);
     }
 #endif
@@ -997,7 +998,7 @@ class FASTDB_DLL_ENTRY dbDatabase
     }
 #endif
     /**
-     * Find cloned table desciptor assigned to this database 
+     * Find cloned table desciptor assigned to this database
      * @param desc static unassigned table descriptor
      * @return clone of this table descriptor assigned to this databae or NULL
      * if not found.
@@ -1014,16 +1015,16 @@ class FASTDB_DLL_ENTRY dbDatabase
      * Get number of transaction proceeded by all clients since database open.
      * @return number of committed or aborted transactions since database open.
      */
-    int getNumberOfProceededTransactions() { 
+    int getNumberOfProceededTransactions() {
         return monitor->concurrentTransId - 1;
     }
 
     /**
-     * Check if OID corresponds to the valid object 
+     * Check if OID corresponds to the valid object
      * @param oid inspected OID
-     * @return whether OID is valid or not 
-     */     
-    bool isValidOid(oid_t oid) { 
+     * @return whether OID is valid or not
+     */
+    bool isValidOid(oid_t oid) {
         if (oid < dbFirstUserId || oid >= currIndexSize) {
             return false;
         }
@@ -1033,36 +1034,36 @@ class FASTDB_DLL_ENTRY dbDatabase
     /**
      * Export database in XML format to the specified stream
      * @param out stream where XML representation of database will be printed
-     * @param encoding generated XML document encoding (no conversion to the specified 
+     * @param encoding generated XML document encoding (no conversion to the specified
      * encoding is performed, it just specified in xml document header)
      */
     void exportDatabaseToXml(FILE* out, char const* encoding = "UTF-8", bool dtd = true);
 
-    /** 
+    /**
      * Import database from XML data source
      * @param in input stream with XML data
      * @return true if import succeed, false otherwise
      */
     bool importDatabaseFromXml(FILE* in);
-   
+
     /**
      * Export database in XML format to the specified stream
      * @param file path of the file where XML representation of database will be saved
-     * @param encoding generated XML document encoding (no conversion to the specified 
+     * @param encoding generated XML document encoding (no conversion to the specified
      * encoding is performed, it just specified in xml document header)
      * @param dtd generate Document Type Defintion (DTD)
      * @return true if database was successfully exported to the specified file, false if file can not be opened
      */
     bool exportDatabaseToXml(char_t const* file, char const* encoding = "UTF-8", bool dtd = true);
 
-    /** 
+    /**
      * Import database from XML data source
      * @param file path of the file with XML data
      * @return true if import succeed, false otherwise
      * @return true if database was successfully exported to the specified file, false if import failed
      */
     bool importDatabaseFromXml(char_t const* file);
-   
+
 #ifdef PROFILE
     /**
      * Save query execution profile to the specified file
@@ -1084,13 +1085,13 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @param quantum difference in size between fixed size allocator chains
      * @param bufSize maximal number of free elements hold by this allocator
      */
-    void setFixedSizeAllocator(size_t minSize, size_t maxSize, size_t quantum, size_t bufSize) { 
+    void setFixedSizeAllocator(size_t minSize, size_t maxSize, size_t quantum, size_t bufSize) {
         fixedSizeAllocator.init(minSize, maxSize, quantum, bufSize);
     }
 
     /**
      * Try to recover list of free OIDs in case of its corruption by application.
-     * Corruption of free OIDs list can be caused by bugs in application 
+     * Corruption of free OIDs list can be caused by bugs in application
      * (such as "walking pointer" or out-of-bounds access).
      * It most cases databases should be either recovered by automatic FastDB
      * recovery mechanism (which is involved when database was not closed normally)
@@ -1103,12 +1104,12 @@ class FASTDB_DLL_ENTRY dbDatabase
     /**
      * Database constructor
      * @param type access type: <code>dbDatabase::dbReadOnly</code> or <code>dbDatabase::dbAllAcces</code>
-     * @param dbInitSize initial size of the database. If FastDB is compiled with 
-     * DISKLESS_CONFIGURATION option, then in this parameter <B>MAXIMAL</B> size of the 
+     * @param dbInitSize initial size of the database. If FastDB is compiled with
+     * DISKLESS_CONFIGURATION option, then in this parameter <B>MAXIMAL</B> size of the
      * database should be specified (in this mode database can not be reallocated)
-     * @param dbExtensionQuantum quantum for extending memory allocation bitmap 
+     * @param dbExtensionQuantum quantum for extending memory allocation bitmap
      * @param dbInitIndexSize initial index size (objects)
-     * @param nThreads concurrency level for sequential search and sort operations 
+     * @param nThreads concurrency level for sequential search and sort operations
      * @see setConcurrency(unsigned nThreads)
      */
     dbDatabase(dbAccessType type = dbAllAccess,
@@ -1117,7 +1118,7 @@ class FASTDB_DLL_ENTRY dbDatabase
                size_t dbInitIndexSize = dbDefaultInitIndexSize,
                int nThreads = 1,
                // Do not specify the following parameter - them are used only for checking
-               // that application and FastDB library were built with the 
+               // that application and FastDB library were built with the
                // same compiler options.
                int mode = 0
 #ifdef NO_PTHREADS
@@ -1126,29 +1127,29 @@ class FASTDB_DLL_ENTRY dbDatabase
 #ifdef REPLICATION_SUPPORT
                | dbHeader::MODE_REPLICATION
 #endif
-#ifdef ALIGN_HEADER      
+#ifdef ALIGN_HEADER
                | dbHeader::MODE_ALIGN_HEADER
-#endif        
-#ifdef PAD_HEADER      
+#endif
+#ifdef PAD_HEADER
                | dbHeader::MODE_PAD_HEADER
-#endif        
+#endif
 #if dbDatabaseOffsetBits > 32
                | dbHeader::MODE_OFFS_64
-#endif        
+#endif
 #if dbDatabaseOidBits > 32
                | dbHeader::MODE_OID_64
-#endif        
-#ifdef AUTOINCREMENT_SUPPORT    
+#endif
+#ifdef AUTOINCREMENT_SUPPORT
                | dbHeader::MODE_AUTOINCREMENT
 #endif
 #ifdef DO_NOT_REUSE_OID_WITHIN_SESSION
                | dbHeader::MODE_DO_NOT_REUSE_OID
 #endif
                );
-    /** 
+    /**
      * Database detructor
      */
-    virtual ~dbDatabase(); 
+    virtual ~dbDatabase();
 
     /**
      * Find table by name. This method get symbol for specified name and call <code>findTable</code>
@@ -1158,7 +1159,7 @@ class FASTDB_DLL_ENTRY dbDatabase
      */
     dbTableDescriptor* findTableByName(char const* name);
 
-    
+
     /**
      * Find table by its OID
      * @param id OID of the table
@@ -1170,7 +1171,7 @@ class FASTDB_DLL_ENTRY dbDatabase
      * Get list of tables attached to the database
      * @return list of tables attached to the database
      */
-    dbTableDescriptor* getTables() { 
+    dbTableDescriptor* getTables() {
         return tables;
     }
 
@@ -1205,7 +1206,7 @@ class FASTDB_DLL_ENTRY dbDatabase
                                 //page objects
     size_t    bitmapEnd;
 
-    struct dbLocation { 
+    struct dbLocation {
         offs_t      pos;
         size_t      size;
         dbLocation* next;
@@ -1237,9 +1238,9 @@ class FASTDB_DLL_ENTRY dbDatabase
     dbGlobalCriticalSection   cs;
     dbGlobalCriticalSection   mutatorCS;
     dbInitializationMutex     initMutex;
-    dbSemaphore               writeSem; 
-    dbSemaphore               readSem; 
-    dbSemaphore               upgradeSem; 
+    dbSemaphore               writeSem;
+    dbSemaphore               readSem;
+    dbSemaphore               upgradeSem;
     dbEvent                   backupCompletedEvent;
     dbMonitor*                monitor;
 
@@ -1250,19 +1251,19 @@ class FASTDB_DLL_ENTRY dbDatabase
 
     soffs_t                   allocatedSize;
     offs_t                    deallocatedSize;
-    
-    time_t                    commitDelay;     
+
+    time_t                    commitDelay;
     time_t                    commitTimeout;
     time_t                    commitTimerStarted;
-    
+
     dbMutex                   delayedCommitStartTimerMutex;
     dbMutex                   delayedCommitStopTimerMutex;
-    dbLocalEvent              delayedCommitStartTimerEvent; 
-    dbEvent                   delayedCommitStopTimerEvent; 
+    dbLocalEvent              delayedCommitStartTimerEvent;
+    dbEvent                   delayedCommitStopTimerEvent;
     dbLocalEvent              commitThreadSyncEvent;
     bool                      delayedCommitEventsOpened;
 
-    dbMutex                   backupMutex;    
+    dbMutex                   backupMutex;
     dbLocalEvent              backupInitEvent;
     char_t*                   backupFileName;
     time_t                    backupPeriod;
@@ -1270,14 +1271,14 @@ class FASTDB_DLL_ENTRY dbDatabase
 
     dbThread                  backupThread;
     dbThread                  commitThread;
- 
+
     int                       accessCount;
 
     dbL2List                  threadContextList;
     dbMutex                   threadContextListMutex;
 
     dbErrorHandler            errorHandler;
-    void*                     errorHandlerContext;   
+    void*                     errorHandlerContext;
 
     dbTransactionLogger*      logger;
 
@@ -1298,13 +1299,13 @@ class FASTDB_DLL_ENTRY dbDatabase
     dbL2List                  watchDogThreadContexts;
     dbMutex*                  watchDogMutex;
 #endif
-    
-    unsigned parallelScanThreshold; 
+
+    unsigned parallelScanThreshold;
     dbTableDescriptor* tableHash[dbTableHashSize];
 
     void exportScheme(FILE* out);
     void exportClass(FILE* out, char* name, dbFieldDescriptor* fieldList);
-   
+
     oid_t mapId(long id);
     bool importField(char* terminator, dbFieldDescriptor* fd, byte* rec, dbXmlScanner& scanner);
     bool importRecord(char* terminator, dbFieldDescriptor* fieldList, byte* rec, dbXmlScanner& scanner);
@@ -1312,7 +1313,7 @@ class FASTDB_DLL_ENTRY dbDatabase
 
    /**
      * Loads all class descriptors. This method should be used SubSQL and any other apllication
-     * which is should work with ANY database file.     
+     * which is should work with ANY database file.
      * @return metatable descriptor
      */
     dbTableDescriptor* loadMetaTable();
@@ -1322,11 +1323,11 @@ class FASTDB_DLL_ENTRY dbDatabase
     void delayedCommit();
     void backupScheduler();
 
-    static void thread_proc delayedCommitProc(void* arg) { 
+    static void thread_proc delayedCommitProc(void* arg) {
         ((dbDatabase*)arg)->delayedCommit();
     }
 
-    static void thread_proc backupSchedulerProc(void* arg) { 
+    static void thread_proc backupSchedulerProc(void* arg) {
         ((dbDatabase*)arg)->backupScheduler();
     }
 
@@ -1352,7 +1353,7 @@ class FASTDB_DLL_ENTRY dbDatabase
      */
     void startWatchDogThreads();
 #endif
-    
+
     /**
      * Add information about lock owner
      */
@@ -1370,7 +1371,14 @@ class FASTDB_DLL_ENTRY dbDatabase
     void commit(dbDatabaseThreadContext* ctx);
 
     /**
-     * Restore consistency of table list of rows (last record should contain null reference     
+     * Load rectangle constant
+     * @param sc search context. sc.literal[0].rect will be assignedpointer to rectangle.
+     * @param opd constant expression of rectangle type
+     */
+    void loadRectangle(dbSearchContext& sc, dbExprNode* opd);
+
+    /**
+     * Restore consistency of table list of rows (last record should contain null reference
      * in next field). This method is used during recovery after crash and during rollback.
      */
     void restoreTablesConsistency();
@@ -1380,11 +1388,11 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @param oid object indentifier
      * @return object with this oid
      */
-    dbRecord* getRow(oid_t oid) { 
+    dbRecord* getRow(oid_t oid) {
         if (currIndex[oid]&(dbFreeHandleMarker|dbInternalObjectMarker)) {
             handleError(dbDatabase::AccessToDeletedObject);
         }
-        return (dbRecord*)(baseAddr + currIndex[oid]); 
+        return (dbRecord*)(baseAddr + currIndex[oid]);
     }
 
     /**
@@ -1396,22 +1404,22 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @param newSize size of new object
      * @return pointer inside database where object should should be stored
      */
-    dbRecord* putRow(oid_t oid, size_t newSize); 
+    dbRecord* putRow(oid_t oid, size_t newSize);
 
     /**
      * Prepare for object update without changing its size
      * @param oid object indetifier
      * @return pointer inside database where object should should be stored
-     */ 
-    dbRecord* putRow(oid_t oid) { 
-        if (oid < committedIndexSize && index[0][oid] == index[1][oid]) { 
+     */
+    dbRecord* putRow(oid_t oid) {
+        if (oid < committedIndexSize && index[0][oid] == index[1][oid]) {
             size_t size = getRow(oid)->size;
             size_t pageNo = oid/dbHandlesPerPage;
             monitor->dirtyPagesMap[pageNo >> 5] |= 1 << (pageNo & 31);
             cloneBitmap(currIndex[oid], size);
             allocate(size, oid);
-        } 
-        return (dbRecord*)(baseAddr + currIndex[oid]); 
+        }
+        return (dbRecord*)(baseAddr + currIndex[oid]);
     }
 
     /**
@@ -1419,8 +1427,8 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @param oid object identifier
      * @return pointer to the record inside database
      */
-    byte* get(oid_t oid) { 
-        return baseAddr + (currIndex[oid] & ~dbInternalObjectMarker); 
+    byte* get(oid_t oid) {
+        return baseAddr + (currIndex[oid] & ~dbInternalObjectMarker);
     }
 
     /**
@@ -1428,33 +1436,33 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @param oid internal object identifier
      * @return pointer to the record inside database
      */
-    byte* put(oid_t oid) { 
-        if (oid < committedIndexSize && index[0][oid] == index[1][oid]) { 
+    byte* put(oid_t oid) {
+        if (oid < committedIndexSize && index[0][oid] == index[1][oid]) {
             offs_t offs = currIndex[oid];
             size_t size = internalObjectSize[offs & dbInternalObjectMarker];
             size_t pageNo = oid/dbHandlesPerPage;
             monitor->dirtyPagesMap[pageNo >> 5] |= 1 << (pageNo & 31);
             allocate(size, oid);
             cloneBitmap(offs & ~dbInternalObjectMarker, size);
-        } 
-        return baseAddr + (currIndex[oid] & ~dbInternalObjectMarker); 
+        }
+        return baseAddr + (currIndex[oid] & ~dbInternalObjectMarker);
     }
-    
+
     /**
      * Check whether query is prefix search: "'key' like field+'%'"
      * @param cursor result set
      * @param expr evaluated expression
      * @param andExpr if not null, then it is used as filter to all records selected by
      * index search
-     * @param indexedField [out] used to return information about which field was used 
-     * to perfrom index search and so order in which selected records are sorted. 
+     * @param indexedField [out] used to return information about which field was used
+     * to perfrom index search and so order in which selected records are sorted.
      * If this order is the same as requested by "order by" clause, then no extra sorting
      * is needed.
-     * @return true if search was performed using indeices,  false if index is not applicable 
+     * @return true if search was performed using indeices,  false if index is not applicable
      * and sequential search is required
      */
-    bool isPrefixSearch(dbAnyCursor* cursor, 
-                        dbExprNode* expr, dbExprNode* andExpr, 
+    bool isPrefixSearch(dbAnyCursor* cursor,
+                        dbExprNode* expr, dbExprNode* andExpr,
                         dbFieldDescriptor* &indexedField);
 
     /**
@@ -1463,15 +1471,15 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @param expr evaluated expression
      * @param andExpr if not null, then it is used as filter to all records selected by
      * index search
-     * @param indexedField [out] used to return information about which field was used 
-     * to perfrom index search and so order in which selected records are sorted. 
+     * @param indexedField [out] used to return information about which field was used
+     * to perfrom index search and so order in which selected records are sorted.
      * If this order is the same as requested by "order by" clause, then no extra sorting
      * is needed.
-     * @return true if search was performed using indeices,  false if index is not applicable 
+     * @return true if search was performed using indeices,  false if index is not applicable
      * and sequential search is required
      */
-    bool isIndexApplicable(dbAnyCursor* cursor, 
-                           dbExprNode* expr, dbExprNode* andExpr, 
+    bool isIndexApplicable(dbAnyCursor* cursor,
+                           dbExprNode* expr, dbExprNode* andExpr,
                            dbFieldDescriptor* &indexedField);
 
     /**
@@ -1482,17 +1490,17 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @param expr evaluated expression
      * @param andExpr if not null, then it is used as filter to all records selected by
      * index search
-     * @return true if expression was evaluated using index, false if index is not applicable 
+     * @return true if expression was evaluated using index, false if index is not applicable
      * and sequential search is required
      */
-    bool isIndexApplicable(dbAnyCursor* cursor, 
+    bool isIndexApplicable(dbAnyCursor* cursor,
                            dbExprNode* expr, dbExprNode* andExpr);
 
     /**
      * If query predicate contains operands from other tables (accessed by references)
      * and inverse references exists, then FastDB performs
      * indexed search in referenced table and then go back using inverse referenced to
-     * query table. followInverseReference method performs this backward traversal of inverse 
+     * query table. followInverseReference method performs this backward traversal of inverse
      * references.
      * @param expr evaluated expression
      * @param andExpr if not null, then it is used as filter to all records selected by
@@ -1500,7 +1508,7 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @param cursor cursor to collect selected records
      * @param iref OID of the selected records in referenced table
      */
-    bool followInverseReference(dbExprNode* expr, dbExprNode* andExpr, 
+    bool followInverseReference(dbExprNode* expr, dbExprNode* andExpr,
                                 dbAnyCursor* cursor, oid_t iref);
 
     /**
@@ -1514,21 +1522,21 @@ class FASTDB_DLL_ENTRY dbDatabase
 
     /**
      * Check whether index exists for derefenced field
-     * @param expr dereference expression 
+     * @param expr dereference expression
      * @return <code>true</code> if reference field is indexed
      */
     bool existsIndexedReference(dbExprNode* expr);
 
     /**
-     * Execute expression. This method is most frequently recursivly called during 
+     * Execute expression. This method is most frequently recursivly called during
      * evaluation of search predicate.
      * @param expr expression to be executed
-     * @param iattr inherited attributes - attributes passed top-down 
+     * @param iattr inherited attributes - attributes passed top-down
      * (information like cursor, current record, ...)
      * @param sattr synthesized attribute - sttributes passed down-top
      * (value of expression)
      */
-    static void _fastcall execute(dbExprNode* expr, 
+    static void _fastcall execute(dbExprNode* expr,
                                   dbInheritedAttribute& iattr,
                                   dbSynthesizedAttribute& sattr);
 
@@ -1570,7 +1578,7 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @param record updated image of the record
      */
     void update(oid_t oid, dbTableDescriptor* table, void const* record);
-    
+
     /**
      * Remove record from the database
      * @param table descriptor of the table to which record belongs
@@ -1581,14 +1589,14 @@ class FASTDB_DLL_ENTRY dbDatabase
     /**
      * Allocate object in the database
      * e@param size size of alocated object
-     * @param oid if oid is not 0, then allocated region position is stored in correcpondent 
+     * @param oid if oid is not 0, then allocated region position is stored in correcpondent
      * cell of object index (needed for allocation of bitmap pages)
      * @return position of allcoated region
      */
     offs_t allocate(size_t size, oid_t oid = 0);
 
     /**
-     * Deallocate region 
+     * Deallocate region
      * @param pos start position of region
      * @param size of region
      */
@@ -1611,8 +1619,8 @@ class FASTDB_DLL_ENTRY dbDatabase
     /**
      * Allocate object identifier(s)
      * @param n number of allocated object indentifiers
-     * @return object idenitifer (in case if n greater than 1, all n subsequent OIDs are 
-     * allocated and first one is returned     
+     * @return object idenitifer (in case if n greater than 1, all n subsequent OIDs are
+     * allocated and first one is returned
      */
     oid_t allocateId(int n = 1);
 
@@ -1628,16 +1636,16 @@ class FASTDB_DLL_ENTRY dbDatabase
      * Update record in in all active cursors if it this record is checnged in the database
      * @param oid object indentifier of checnged record
      * @param removed true if record was removed
-      */ 
+      */
     void updateCursors(oid_t oid, bool removed = false);
-    
+
     /**
      * Perform database recovery after fault
      */
     void recovery();
 
     /**
-     * Check if program works with correct version of memory mapped object (if memory mapped 
+     * Check if program works with correct version of memory mapped object (if memory mapped
      * object is reallocated by some client, its version number is incremented, so
      * all other client will be able to notice it and also reallocate their memory
      * mapping objects.
@@ -1659,7 +1667,7 @@ class FASTDB_DLL_ENTRY dbDatabase
     }
 
     /**
-     * Allocate record 
+     * Allocate record
      * @param tableId object identifier of the table
      * @param size size of the created record
      * as table descriptor in the database
@@ -1670,7 +1678,7 @@ class FASTDB_DLL_ENTRY dbDatabase
         allocateRow(tableId, oid, size);
         return oid;
     }
-    
+
     /**
      * Allocate record with specified OID
      * @param tableId object identifier of the table
@@ -1690,12 +1698,12 @@ class FASTDB_DLL_ENTRY dbDatabase
     /**
      * Free internal object
      */
-    void freeObject(oid_t oid); 
-    
+    void freeObject(oid_t oid);
+
     /**
      * Cleanup compiled query
      */
-    static void deleteCompiledQuery(dbExprNode* tree); 
+    static void deleteCompiledQuery(dbExprNode* tree);
 
     /**
      * Start database transaction
@@ -1708,10 +1716,10 @@ class FASTDB_DLL_ENTRY dbDatabase
     /**
      * End transaction
      */
-    void endTransaction() { 
+    void endTransaction() {
         endTransaction(threadContext.get());
     }
-    
+
     /**
      * End transaction with specified thread context
      * @param ctx thread context
@@ -1725,14 +1733,14 @@ class FASTDB_DLL_ENTRY dbDatabase
      * included metatable itself). This method is invoked during database initialzation.
      */
     void initializeMetaTable();
-    
+
     /**
-     * Load database scheme. This method loads table decriptors from database, 
+     * Load database scheme. This method loads table decriptors from database,
      * compare them with application classes, do necessary reformatting and save
      * update andnew table decriptor in database
-     * @param alter if true then schema can be altered, otherwise there are some  
-     * other active clients working with this database so schema can not be altered     
-     */     
+     * @param alter if true then schema can be altered, otherwise there are some
+     * other active clients working with this database so schema can not be altered
+     */
     bool loadScheme(bool alter);
 
     /**
@@ -1750,8 +1758,8 @@ class FASTDB_DLL_ENTRY dbDatabase
     void reformatTable(oid_t tableId, dbTableDescriptor* desc);
 
     /**
-     * Add new indices to the table. 
-     * @param alter if true than indices can be added, otherwise there are some other active 
+     * Add new indices to the table.
+     * @param alter if true than indices can be added, otherwise there are some other active
      * clients and adding new indices about which they will not know can lead to inconsistncy
      * @param desc new table descriptor
      * @return true if indices were succesfully added
@@ -1766,7 +1774,7 @@ class FASTDB_DLL_ENTRY dbDatabase
     oid_t addNewTable(dbTableDescriptor* desc);
 
     /**
-     * Update database table descriptor 
+     * Update database table descriptor
      * @param desc application table descriptor
      * @param tableId OID of recrods with database table descriptor
      */
@@ -1774,13 +1782,13 @@ class FASTDB_DLL_ENTRY dbDatabase
 
     /**
      * Insert inverse reference. When reference or array of reference which is part of relation is updated
-     * then reference to the updated record is inserted in inverse reference field of all 
+     * then reference to the updated record is inserted in inverse reference field of all
      * new referenced records (which were not referenced by this field  before update).
      * @param fd descriptor of updated field (inverse reference should exist for this field)
      * @param reverseId OID of updated record
      * @param targetId OID of record referenced by this field
      */
-    void insertInverseReference(dbFieldDescriptor* fd, 
+    void insertInverseReference(dbFieldDescriptor* fd,
                                 oid_t reverseId, oid_t targetId);
 
     /**
@@ -1792,13 +1800,13 @@ class FASTDB_DLL_ENTRY dbDatabase
 
     /**
      * Remove inverse reference. When reference or array of reference which is part of relation is updated
-     * then reference to the updated record is removed from inverse reference field of all 
+     * then reference to the updated record is removed from inverse reference field of all
      * referenced records which are not reference any more from by this field.
      * @param fd descriptor of updated field (inverse reference should exist for this field)
      * @param reverseId OID of updated record
      * @param targetId OID of record referenced by this field
      */
-    void removeInverseReference(dbFieldDescriptor* fd, 
+    void removeInverseReference(dbFieldDescriptor* fd,
                                 oid_t reverseId, oid_t targetId);
 
     /**
@@ -1828,7 +1836,7 @@ class FASTDB_DLL_ENTRY dbDatabase
     /**
      * Drop T-Tree index for the field
      * @param fd field descriptor
-     */    
+     */
     void dropIndex(dbFieldDescriptor* fd);
 
     /**
@@ -1839,14 +1847,14 @@ class FASTDB_DLL_ENTRY dbDatabase
 
     /**
      * Link table to the database table list
-     * @param table table descriptor 
+     * @param table table descriptor
      * @param tableId OID of record containing database table descriptor
      */
     void linkTable(dbTableDescriptor* table, oid_t tableId);
 
     /**
      * Unlink table from the database tables list
-     * @param table table descriptor 
+     * @param table table descriptor
      */
     void unlinkTable(dbTableDescriptor* table);
 
@@ -1864,7 +1872,7 @@ class FASTDB_DLL_ENTRY dbDatabase
      * @return table descriptor or <code>NULL</code> if not found
      */
     dbTableDescriptor* findTable(char const* name);
-    
+
     /**
      * Mark database as been modified
      */
@@ -1894,7 +1902,7 @@ class FASTDB_DLL_ENTRY dbDatabase
 
 #ifdef REPLICATION_SUPPORT
 
-class FASTDB_DLL_ENTRY dbConnection { 
+class FASTDB_DLL_ENTRY dbConnection {
  public:
     socket_t*    reqSock;
     socket_t*    respSock;
@@ -1910,7 +1918,7 @@ class FASTDB_DLL_ENTRY dbConnection {
     int          updateCounter;
     int          nRecoveredPages;
 
-    dbConnection() { 
+    dbConnection() {
         readyEvent.open();
         useEvent.open();
         statusEvent.open();
@@ -1923,7 +1931,7 @@ class FASTDB_DLL_ENTRY dbConnection {
         nRecoveredPages = 0;
     }
     ~dbConnection();
-}; 
+};
 
 class FASTDB_DLL_ENTRY dbReplicatedDatabase : public dbDatabase {
     friend class dbFile;
@@ -1933,14 +1941,14 @@ class FASTDB_DLL_ENTRY dbReplicatedDatabase : public dbDatabase {
     int           id;
     dbConnection* con;
 
-    enum NodeStatus { 
-        ST_OFFLINE,  // node is not available 
-        ST_ONLINE,   // node is available 
+    enum NodeStatus {
+        ST_OFFLINE,  // node is not available
+        ST_ONLINE,   // node is available
         ST_ACTIVE,   // primary node is running, replicating changes
         ST_STANDBY,  // standby node receives changes from primary node
         ST_RECOVERED // node is recovered after the fault
     };
-    
+
     dbLocalEvent  startEvent;
     dbLocalEvent  recoveredEvent;
     dbMutex       startCS;
@@ -1951,7 +1959,7 @@ class FASTDB_DLL_ENTRY dbReplicatedDatabase : public dbDatabase {
     int           activeNodeId;
     int           masterNodeId;
     bool          onlineRecovery;
-    bool          handshake; 
+    bool          handshake;
     dbMutex       sockCS;
     socket_t*     acceptSock;
     dbThread      readerThread;
@@ -1978,7 +1986,7 @@ class FASTDB_DLL_ENTRY dbReplicatedDatabase : public dbDatabase {
     void unlockConnection(int nodeId);
     void changeActiveNode();
     void addConnection(int nodeId, socket_t* s);
-    bool writeReq(int nodeId, ReplicationRequest const& hdr, 
+    bool writeReq(int nodeId, ReplicationRequest const& hdr,
                   void* body = NULL, size_t bodySize = 0);
     bool writeResp(int nodeId, ReplicationRequest const& hdr);
 
@@ -1999,7 +2007,7 @@ class FASTDB_DLL_ENTRY dbReplicatedDatabase : public dbDatabase {
 #endif
 
 template<class T>
-dbReference<T> insert(T const& record) { 
+dbReference<T> insert(T const& record) {
     dbReference<T> ref;
     T::dbDescriptor.getDatabase()->insertRecord(&T::dbDescriptor, &ref, &record);
     return ref;
@@ -2017,7 +2025,7 @@ dbReference<T> insert(dbDatabase& db, T const& record) {
 /**
  * Search contrext used to pass information about search parameters to T-Tree and Hash table index implementations
  */
-class dbSearchContext { 
+class dbSearchContext {
   public:
     dbDatabase*        db;
     dbExprNode*        condition;

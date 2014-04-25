@@ -19,19 +19,19 @@ BEGIN_FASTDB_NAMESPACE
 
 class dbAnyCursor;
 
-class dbRtreePage { 
+class dbRtreePage {
   public:
-    struct branch { 
+    struct branch {
         rectangle rect;
         oid_t     p;
     };
-    
-    enum { 
+
+    enum {
         card = (dbPageSize - 4) / sizeof(branch), // maximal number of branches at page
         min_fill = card/2        // minimal number of branches at non-root page
     };
 
-    struct reinsert_list { 
+    struct reinsert_list {
         oid_t     chain;
         int       level;
         reinsert_list() { chain = 0; }
@@ -42,7 +42,7 @@ class dbRtreePage {
 
     static oid_t insert(dbDatabase* db, rectangle const& r, oid_t pageId, oid_t recordId, int level);
 
-    static bool remove(dbDatabase* db, rectangle const& r, oid_t pageId, oid_t recordId, 
+    static bool remove(dbDatabase* db, rectangle const& r, oid_t pageId, oid_t recordId,
                        int level, reinsert_list& rlist);
 
     void cover(rectangle& r) const;
@@ -54,8 +54,8 @@ class dbRtreePage {
 
     static void purge(dbDatabase* db, oid_t pageId, int level);
 
-    oid_t next_reinsert_page() const { 
-        return b[card-1].p; 
+    oid_t next_reinsert_page() const {
+        return b[card-1].p;
     }
 
     static oid_t allocate(dbDatabase* db, oid_t recordId, rectangle const& r);
@@ -66,13 +66,13 @@ class dbRtreePage {
     };
 
 class FASTDB_DLL_ENTRY dbRtree {
-  public: 
-    enum searchOp { 
-        EQUAL, 
-        OVERLAPS, 
+  public:
+    enum searchOp {
+        EQUAL,
+        OVERLAPS,
         SUPERSET,
-        PROPER_SUPERSET, 
-        SUBSET, 
+        PROPER_SUPERSET,
+        SUBSET,
         PROPER_SUBSET
     };
 
@@ -84,7 +84,7 @@ class FASTDB_DLL_ENTRY dbRtree {
     static void  purge(dbDatabase* db, oid_t treeId);
     static void  drop(dbDatabase* db, oid_t treeId);
     static void  cover(dbDatabase* db, oid_t treeId, rectangle& r);
-
+    static void  traverse(dbDatabase* db, oid_t treeId, dbSearchContext& sc);
   protected:
     int4   height;
     oid_t  root;
