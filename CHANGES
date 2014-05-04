@@ -1037,9 +1037,7 @@ that not all fields are described was produced incorrectly)
 
 
 
---- Release version 3.76 ??.02.2014 -------------------------------------
+--- Release version 3.76 04.05.2014 -------------------------------------
 1. Add cli_open_force_read and cli_open_no_sync flags
-
---- Release version 3.77 ??.04.2014 -------------------------------------
-1. Support iteration through neigbors using R-Tree index:
+2. Support iteration through neigbors using R-Tree index:
 select * from t order by distance(r,(5,5));
