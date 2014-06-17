@@ -51,7 +51,7 @@ template < class e_type >
 void median_estimate(e_type * array, size_t n)
 {
     e_type          temp;
-    long unsigned   lu_seed = 123456789LU;
+    static long unsigned lu_seed = 123456789LU;
     const size_t    k = ((lu_seed) = 69069 * (lu_seed) + 362437) % --n;
     ((void) ((temp) = *(array), *(array) = *(array + k), *(array + k) = (temp)));
     if ((*((array + 1)) > *((array)))) {
@@ -196,9 +196,9 @@ void heapsort(e_type * array, size_t nmemb)
     }
 }
 
-// 
+//
 // We use this to check to see if a partition is already sorted.
-// 
+//
 
 template < class e_type >
 int sorted(e_type * array, size_t nmemb)
@@ -212,9 +212,9 @@ int sorted(e_type * array, size_t nmemb)
     return 1;
 }
 
-// 
+//
 // We use this to check to see if a partition is already reverse-sorted.
-// 
+//
 
 template < class e_type >
 int             rev_sorted(e_type * array, size_t nmemb)
@@ -228,9 +228,9 @@ int             rev_sorted(e_type * array, size_t nmemb)
     return 1;
 }
 
-// 
+//
 // We use this to reverse a reverse-sorted partition.
-// 
+//
 
 template < class e_type >
 void rev_array(e_type * array, size_t nmemb)
@@ -243,11 +243,11 @@ void rev_array(e_type * array, size_t nmemb)
     }
 }
 
-// 
+//
 // Introspective quick sort algorithm user entry point.
 // You do not need to directly call any other sorting template.
 // This sort will perform very well under all circumstances.
-// 
+//
 
 template < class e_type >
 void iqsort(e_type * array, size_t nmemb)
