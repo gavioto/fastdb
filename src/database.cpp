@@ -5627,9 +5627,10 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
     offs_t pos;
     oid_t i, firstPage, lastPage;
     int holeBitSize = 0;
-    register int    alignment = size & (dbPageSize-1);
+    int allocBitSize = objBitSize;
+    int alignment = size & (dbPageSize-1);
     const size_t    inc = dbPageSize/dbAllocationQuantum/8;
-    register size_t offs;
+    size_t offs;
 
     const int  pageBits = dbPageSize*8;
     int        holeBeforeFreePage  = 0;
@@ -5639,6 +5640,10 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
     allocatedSize += (offs_t)size;
 
     if (alignment == 0) {
+        if (reservedChainLength & 1) { 
+            FASTDB_ASSERT(size == dbPageSize);
+            allocBitSize <<= 1;
+        }
         if (reservedChainLength > dbAllocRecursionLimit) {
             firstPage = bitmapEnd;
             if (firstPage >= lastPage) {
@@ -5685,8 +5690,8 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
         if (alignment == 0) {
             // allocate page object
             for (i = firstPage; i < lastPage && currIndex[i] != dbFreeHandleMarker; i++){
-                int spaceNeeded = objBitSize - holeBitSize < pageBits
-                    ? objBitSize - holeBitSize : pageBits;
+                int spaceNeeded = allocBitSize - holeBitSize < pageBits
+                    ? allocBitSize - holeBitSize : pageBits;
                 if (bitmapPageAvailableSpace[i] <= spaceNeeded) {
                     holeBitSize = 0;
                     offs = 0;
@@ -5698,7 +5703,7 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
                     if (begin[offs++] != 0) {
                         offs = DOALIGN(offs, inc);
                         holeBitSize = 0;
-                    } else if ((holeBitSize += 8) == objBitSize) {
+                    } else if ((holeBitSize += 8) == allocBitSize) {
                         pos = (offs_t)(((offs_t(i-dbBitmapId)*dbPageSize + offs)*8
                                - holeBitSize) << dbAllocationQuantumBits);
                         if (wasReserved(pos, size)) {
@@ -5710,16 +5715,26 @@ offs_t dbDatabase::allocate(size_t size, oid_t oid)
                         extend(pos + (offs_t)size);
                         {
                             dbLocation location(this, pos, size);
-                            currPBitmapPage = i;
-                            currPBitmapOffs = offs;
                             if (oid != 0) {
                                 offs_t prev = currIndex[oid];
                                 memcpy(baseAddr+pos,
                                    baseAddr+(prev&~dbInternalObjectMarker), size);
                                 currIndex[oid] = (prev & dbInternalObjectMarker) + pos;
                             }
-                            begin = put(i);
                             size_t holeBytes = holeBitSize >> 3;
+                            if (allocBitSize != objBitSize) { 
+                                FASTDB_ASSERT(holeBytes == inc*2);                                
+                                holeBytes = inc;
+                                if (inc > offs) {
+                                    i -= 1;
+                                    offs = dbPageSize;
+                                } else { 
+                                    offs -= inc;
+                                }
+                            }
+                            currPBitmapPage = i;
+                            currPBitmapOffs = offs;
+                            begin = put(i);
                             if (holeBytes > offs) {
                                 memset(begin, 0xFF, offs);
                                 holeBytes -= offs;
