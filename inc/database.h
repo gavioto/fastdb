@@ -987,7 +987,7 @@ class FASTDB_DLL_ENTRY dbDatabase
 #ifndef NO_MEMBER_TEMPLATES
     /**
      * Insert record in the database
-     * @param record transient object to be insrted in the database
+     * @param record transient object to be inserted in the database
      * @return reference to the created object
      */
     template<class T>
