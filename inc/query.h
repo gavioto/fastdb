@@ -233,7 +233,7 @@ class FASTDB_DLL_ENTRY dbQueryExpression {
     dbQueryExpression& operator,(rectangle const& rect) {
         return add(dbQueryElement::qVarRectangle, &rect);
     }
-    dbQueryExpression& operator,(rectangle* rect) {
+    dbQueryExpression& operator,(rectangle* const& rect) {
         return add(dbQueryElement::qVarRectanglePtr, &rect);
     }
 #ifdef USE_STD_STRING
@@ -464,7 +464,7 @@ class FASTDB_DLL_ENTRY dbQuery : public dbCompiledQuery {
     dbQuery& add(rectangle const& rect) {
         return append(dbQueryElement::qVarRectangle, &rect);
     }
-    dbQuery& add(rectangle* rect) {
+    dbQuery& add(rectangle* const& rect) {
         return append(dbQueryElement::qVarRectanglePtr, &rect);
     }
 #ifdef USE_STD_STRING
@@ -555,6 +555,7 @@ class FASTDB_DLL_ENTRY dbQuery : public dbCompiledQuery {
     dbQuery& operator,(void const*  value) { return add(value); }
     dbQuery& operator,(dbQueryExpression const& expr) { return add(expr); }
     dbQuery& operator,(rectangle const& rect) { return add(rect); }
+    dbQuery& operator,(rectangle* const& rect) { return add(rect); }
 
     dbQuery& operator = (const char* str) { 
         return reset().append(dbQueryElement::qExpression, str);
