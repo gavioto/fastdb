@@ -116,7 +116,7 @@ int main()
     if (db.open(_T("testddl"))) { 
         printf("Database intialized\n");
         dbCursor<Record> cursor;
-        if (cursor.select("abs(sin(c)^2 + cos(c)^2 - 1) < 1e-5") > 0) { 
+        if (cursor.select("abs(mysin(c)^2 + mycos(c)^2 - 1) < 1e-5") > 0) { 
             do { 
                 cursor->dump();
             } while (cursor.next());
