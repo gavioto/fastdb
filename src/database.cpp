@@ -4844,9 +4844,9 @@ void dbDatabase::select(dbAnyCursor* cursor, dbQuery& query)
                               condition, indexedField))
         {
             if (query.order != NULL) {
-                if (/*indexedField->defTable != query.table
-                      || */query.order->next != NULL
-                           || query.order->getField() != indexedField)
+                if (indexedField->defTable != query.table
+                    || query.order->next != NULL
+                    || query.order->getField() != indexedField)
                 {
                     cursor->selection.sort(this, query.order);
                 } else if (!query.order->ascent) {
@@ -4874,8 +4874,8 @@ void dbDatabase::select(dbAnyCursor* cursor, dbQuery& query)
             && isIndexApplicable(cursor, condition, NULL, indexedField))
         {
             if (query.order != NULL) {
-                if (/*indexedField->defTable != query.table
-                      || */condition != query.tree
+                if (indexedField->defTable != query.table
+                    || condition != query.tree
                     || query.order->next != NULL
                     || query.order->getField() != indexedField)
                 {
