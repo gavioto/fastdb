@@ -244,7 +244,7 @@ static wait_status wait_semaphore(int& sem, unsigned msec,
             }
             gettimeofday(&start, NULL);
             if (stop.tv_sec < start.tv_sec || 
-               (stop.tv_sec == start.tv_sec && stop.tv_usec < start.tv_sec))
+               (stop.tv_sec == start.tv_sec && stop.tv_usec < start.tv_usec))
             {
                 return wait_timeout_expired;
             }
