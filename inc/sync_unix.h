@@ -517,7 +517,7 @@ class dbSemaphore {
     }
 
     bool wait(unsigned msec) { 
-#ifdef POSIX_1003_1d
+#if POSIX_1003_1d
         struct timespec abs_ts;
         struct timeval  cur_tv;
         clock_gettime(CLOCK_REALTIME, &cur_tv);
