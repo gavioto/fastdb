@@ -1036,8 +1036,11 @@ that not all fields are described was produced incorrectly)
 1. Undo changes in release 3.70.
 
 
-
 --- Release version 3.76 04.05.2014 -------------------------------------
 1. Add cli_open_force_read and cli_open_no_sync flags
 2. Support iteration through neigbors using R-Tree index:
 select * from t order by distance(r,(5,5));
+
+
+--- Release version 3.77 ??.01.2015 -------------------------------------
+1. Fix bug in closing database with delayed commit 
