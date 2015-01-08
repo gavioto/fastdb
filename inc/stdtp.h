@@ -121,8 +121,17 @@
 #endif
 
 #ifdef __QNX__
-#define USE_POSIX_API 1
-#define POSIX_1003_1d 1
+#define USE_POSIX_SEMAPHORES true
+#define USE_POSIX_MMAP true
+#define POSIX_1003_1d true
+#endif
+
+#if defined(USE_POSIX_SEMAPHORES) && !defined(POSIX_1003_1d)
+#if _POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600
+#define POSIX_1003_1d true
+#else
+#define POSIX_1003_1d false
+#endif
 #endif
 
 #if defined(__MINGW32__) && !defined(_WIN32)
