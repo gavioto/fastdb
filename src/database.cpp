@@ -6577,15 +6577,17 @@ void dbDatabase::delayedCommit()
 {
     dbCriticalSection cs(delayedCommitStartTimerMutex);
     commitThreadSyncEvent.signal();
-    while (!stopDelayedCommitThread) {
-        delayedCommitStartTimerEvent.wait(delayedCommitStartTimerMutex);
-        delayedCommitStartTimerEvent.reset();
+    while (!stopDelayedCommitThread || monitor->delayedCommitContext != NULL) {
+        if (monitor->delayedCommitContext == NULL) { 
+            delayedCommitStartTimerEvent.wait(delayedCommitStartTimerMutex);
+            delayedCommitStartTimerEvent.reset();
+        }
         bool deferredCommit = false;
         {
             dbCriticalSection cs2(delayedCommitStopTimerMutex);
-            if (stopDelayedCommitThread || monitor->delayedCommitContext == NULL) {
+            if (monitor->delayedCommitContext == NULL) {
                 continue;
-            } else if (monitor->forceCommitCount == 0) {
+            } else if (!stopDelayedCommitThread && monitor->forceCommitCount == 0) {
                 commitTimerStarted = time(NULL);
                 deferredCommit = true;
             }
