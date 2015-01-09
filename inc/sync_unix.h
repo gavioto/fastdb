@@ -741,7 +741,7 @@ class dbSharedObject : public dbSharedMemory {
 #endif
 
 //////////////////////////////////////////////////////////////////////////
-// Define dBGlobalCriticalSection for various platforms
+// Define dbGlobalCriticalSection for various platforms
 
 // QNX uses a pthread based mutex for its implementation
 //     Use only if pthread support is also enabled, else we'll use the default case
@@ -900,7 +900,7 @@ class dbGlobalCriticalSection {
         delete[] sem_name;
         sem_name = new char[strlen(name)+1];
         strcpy(sem_name, name);
-        sem = sem_open(name, 0);
+        sem = sem_open(name, O_CREAT, 0777, 0);
         return sem != SEM_FAILED;
     }
 
