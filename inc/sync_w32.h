@@ -392,7 +392,8 @@ class FASTDB_DLL_ENTRY dbGlobalCriticalSection {
     }
 
     bool open(char_t const* name, long* count) { 
-        mutex = OpenMutex(MUTEX_ALL_ACCESS, true, name);
+        mutex = CreateMutex(FASTDB_SECURITY_ATTRIBUTES, false, name);
+        //        mutex = OpenMutex(MUTEX_ALL_ACCESS, false, name);
         return mutex != NULL;
     }
 
@@ -430,7 +431,8 @@ class FASTDB_DLL_ENTRY dbGlobalCriticalSection {
 
     bool open(char_t const* name, long* count) { 
         this->count = count;
-        event = OpenEvent(EVENT_ALL_ACCESS, FALSE, name);
+        event = CreateEvent(FASTDB_SECURITY_ATTRIBUTES, false, false, name);
+        //        event = OpenEvent(EVENT_ALL_ACCESS, FALSE, name);
         return event != NULL;
     }
     bool create(char_t const* name, long* count) { 
