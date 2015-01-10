@@ -156,7 +156,6 @@ class FASTDB_DLL_ENTRY dbInitializationMutex {
         if (GetLastError() == ERROR_ALREADY_EXISTS) { 
             status = WaitForSingleObject(m, INFINITE) == WAIT_OBJECT_0 
                    ? AlreadyInitialized : InitializationError;
-            ReleaseMutex(m);
         } else if (m != NULL) { 
             status = NotYetInitialized;
         } else { 
@@ -168,11 +167,11 @@ class FASTDB_DLL_ENTRY dbInitializationMutex {
         ReleaseMutex(m);
     }
     bool close() {
-        CloseHandle(m);
+        WaitForSingleObject(m, INFINITE); // lock mutex
         return false;
     }
     void erase() { 
-        close();
+        CloseHandle(m);
     }
     dbInitializationMutex() { 
         m = NULL;
@@ -392,8 +391,7 @@ class FASTDB_DLL_ENTRY dbGlobalCriticalSection {
     }
 
     bool open(char_t const* name, long* count) { 
-        mutex = CreateMutex(FASTDB_SECURITY_ATTRIBUTES, false, name);
-        //        mutex = OpenMutex(MUTEX_ALL_ACCESS, false, name);
+        mutex = OpenMutex(MUTEX_ALL_ACCESS, false, name);
         return mutex != NULL;
     }
 
@@ -431,8 +429,7 @@ class FASTDB_DLL_ENTRY dbGlobalCriticalSection {
 
     bool open(char_t const* name, long* count) { 
         this->count = count;
-        event = CreateEvent(FASTDB_SECURITY_ATTRIBUTES, false, false, name);
-        //        event = OpenEvent(EVENT_ALL_ACCESS, FALSE, name);
+        event = OpenEvent(EVENT_ALL_ACCESS, FALSE, name);
         return event != NULL;
     }
     bool create(char_t const* name, long* count) { 

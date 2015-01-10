@@ -547,7 +547,7 @@ void dbGlobalCriticalSection::erase()
 dbInitializationMutex::initializationStatus 
 dbInitializationMutex::initialize(char const* name)
 {
-    struct sembuf sops[4];
+    struct sembuf sops[5];
     char* path = (char*)name;
     if (strchr(name, '/') == NULL) { 
         path = new char[strlen(name)+strlen(keyFileDir)+1];
@@ -587,7 +587,7 @@ dbInitializationMutex::initialize(char const* name)
         sops[1].sem_op  = 1; /* increment number of active processes */
         sops[1].sem_flg = SEM_UNDO;
         sops[2].sem_num = 1;
-        sops[2].sem_op  = 1; /* initialization in process */
+        sops[2].sem_op  = 1; /* enter critical section (initialization in process) */
         sops[2].sem_flg = SEM_UNDO;
         sops[3].sem_num = 2;
         sops[3].sem_op  = 0; /* check if semaphore was destroyed */
@@ -600,13 +600,16 @@ dbInitializationMutex::initialize(char const* name)
                 sops[1].sem_num = 1;
                 sops[1].sem_op  = 0; /* wait until inialization completed */
                 sops[1].sem_flg = 0;
-                sops[2].sem_num = 0;
-                sops[2].sem_op  = 2; /* increment number of active processes */
+                sops[2].sem_num = 1;
+                sops[2].sem_op  = 1; /* enter critical section */
                 sops[2].sem_flg = SEM_UNDO;
-                sops[3].sem_num = 2;
-                sops[3].sem_op  = 0; /* check if semaphore was destroyed */
-                sops[3].sem_flg = IPC_NOWAIT;
-                if (semop(semid, sops, 4) == 0) { 
+                sops[3].sem_num = 0;
+                sops[3].sem_op  = 2; /* increment number of active processes */
+                sops[3].sem_flg = SEM_UNDO;
+                sops[4].sem_num = 2;
+                sops[4].sem_op  = 0; /* check if semaphore was destroyed */
+                sops[4].sem_flg = IPC_NOWAIT;
+                if (semop(semid, sops, 5) == 0) { 
                     return AlreadyInitialized;
                 }
                 if (errno == EAGAIN) { 
@@ -629,7 +632,7 @@ void dbInitializationMutex::done()
 {
     struct sembuf sops[1];
     sops[0].sem_num = 1;
-    sops[0].sem_op  = -1; /* initialization done */
+    sops[0].sem_op  = -1; /* leave critical section (initialization done) */
     sops[0].sem_flg = SEM_UNDO;
     int rc = semop(semid, sops, 1);
     assert(rc == 0);
@@ -638,7 +641,7 @@ void dbInitializationMutex::done()
 bool dbInitializationMutex::close()
 {
     int rc;
-    struct sembuf sops[3];
+    struct sembuf sops[4];
     while (true) { 
         sops[0].sem_num = 0;
         sops[0].sem_op  = -1; /* decrement process couter */
@@ -646,10 +649,13 @@ bool dbInitializationMutex::close()
         sops[1].sem_num = 0;
         sops[1].sem_op  = 0;  /* check if there are no more active processes */
         sops[1].sem_flg = IPC_NOWAIT;
-        sops[2].sem_num = 2;
-        sops[2].sem_op  = 1;  /* mark as destructed */
+        sops[2].sem_num = 1;
+        sops[2].sem_op  = 1;  /* enter critical section */
         sops[2].sem_flg = SEM_UNDO;
-        if ((rc = semop(semid, sops, 3)) == 0) { 
+        sops[3].sem_num = 2;
+        sops[3].sem_op  = 1;  /* mark as destructed */
+        sops[3].sem_flg = SEM_UNDO;
+        if ((rc = semop(semid, sops, 4)) == 0) { 
             return true;
         } else { 
             assert(errno == EAGAIN);
@@ -660,7 +666,10 @@ bool dbInitializationMutex::close()
         sops[1].sem_num = 0;
         sops[1].sem_op  = 1;  
         sops[1].sem_flg = SEM_UNDO;
-        if ((rc = semop(semid, sops, 2)) == 0) { 
+        sops[2].sem_num = 1;
+        sops[2].sem_op  = 1;  /* enter critical section */
+        sops[2].sem_flg = SEM_UNDO;
+        if ((rc = semop(semid, sops, 3)) == 0) { 
             return false;
         } else { 
             assert(errno == EAGAIN);
