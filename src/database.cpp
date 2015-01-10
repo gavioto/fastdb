@@ -2411,7 +2411,7 @@ void dbDatabase::cleanup(dbInitializationMutex::initializationStatus status, int
         shm.close();
         // no break
       default:
-        if (status == dbInitializationMutex::NotYetInitialized) {
+        if (status == dbInitializationMutex::NotYetInitialized || step <= 7) {
             initMutex.done();
         }
         initMutex.close();
@@ -2718,6 +2718,7 @@ bool dbDatabase::open(char_t const* dbName, char_t const* fiName,
             }
         }
         version = 0;
+        initMutex.done();
     }
     cs.enter();
     monitor->users += 1;
@@ -3394,6 +3395,7 @@ void dbDatabase::close0()
         commitDelay = 0;
         commitThread.join();
         delayedCommitStartTimerEvent.close();
+        delayedCommitStopTimerEvent.close();
         commitThreadSyncEvent.close();
     }
     {
@@ -3485,6 +3487,7 @@ void dbDatabase::close0()
         if (accessType == dbConcurrentUpdate || accessType == dbConcurrentRead) {
             mutatorCS.close();
         }
+        initMutex.done();
     }
 }
 

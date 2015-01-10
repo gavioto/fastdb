@@ -481,8 +481,7 @@ class dbInitializationMutex {
                     break;
                 }
             } else { 
-                status = (sem_wait(sem) == 0 && sem_post(sem) == 0) 
-                    ? AlreadyInitialized : InitializationError;
+                status = sem_wait(sem) == 0 ? AlreadyInitialized : InitializationError;
                 break;
             }
         }
@@ -493,11 +492,12 @@ class dbInitializationMutex {
         sem_post(sem);
     }
     bool close() {
-        sem_close(sem);
+        sem_wait(sem);
         return true;
     }
     void erase() {
         sem_unlink(name);
+        sem_close(sem);
         delete[] name;
     }
 };
@@ -900,7 +900,7 @@ class dbGlobalCriticalSection {
         delete[] sem_name;
         sem_name = new char[strlen(name)+1];
         strcpy(sem_name, name);
-        sem = sem_open(name, O_CREAT, 0777, 0);
+        sem = sem_open(name, 0);
         return sem != SEM_FAILED;
     }
 
