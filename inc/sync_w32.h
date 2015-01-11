@@ -168,7 +168,7 @@ class FASTDB_DLL_ENTRY dbInitializationMutex {
     }
     bool close() {
         WaitForSingleObject(m, INFINITE); // lock mutex
-        return false;
+        return true;
     }
     void erase() { 
         CloseHandle(m);
