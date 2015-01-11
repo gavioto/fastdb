@@ -152,11 +152,11 @@ class FASTDB_DLL_ENTRY dbInitializationMutex {
         NotYetInitialized
     };
     initializationStatus initialize(char_t const* name) { 
-        char* buf = new char_t[_tcslen(name) + 8];
-        _stprintf(buf, _T("%s.mutex"), name);
+        char* buf = new char_t[_tcslen(name) + 4];
+        _stprintf(buf, _T("%scs"), name);
         mutex = CreateMutex(FASTDB_SECURITY_ATTRIBUTES, false, buf);
         delete[] buf;
-        if (mutex == NULL || !WaitForSingleObject(mutex, INFINITE)) { 
+        if (mutex == NULL || WaitForSingleObject(mutex, INFINITE) != WAIT_OBJECT_0)  { 
             return InitializationError;
         }
         initialized = CreateMutex(FASTDB_SECURITY_ATTRIBUTES, true, name);
