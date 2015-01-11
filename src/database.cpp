@@ -2470,46 +2470,46 @@ bool dbDatabase::open(char_t const* dbName, char_t const* fiName,
     }
     _stprintf(name, _T("%s.dm"), dbName);
     if (!shm.open(name)) {
-        handleError(DatabaseOpenError, "Failed to open database monitor");
         cleanup(status, 0);
+        handleError(DatabaseOpenError, "Failed to open database monitor");
         return false;
     }
     monitor = shm.get();
     _stprintf(name, _T("%s.ws"), dbName);
     if (!writeSem.open(name)) {
+        cleanup(status, 1);
         handleError(DatabaseOpenError,
                     "Failed to initialize database writers semaphore");
-        cleanup(status, 1);
         return false;
     }
     _stprintf(name, _T("%s.rs"), dbName);
     if (!readSem.open(name)) {
+        cleanup(status, 2);
         handleError(DatabaseOpenError,
                     "Failed to initialize database readers semaphore");
-        cleanup(status, 2);
         return false;
     }
     _stprintf(name, _T("%s.us"), dbName);
     if (!upgradeSem.open(name)) {
+        cleanup(status, 3);
         handleError(DatabaseOpenError,
                     "Failed to initialize database upgrade semaphore");
-        cleanup(status, 3);
         return false;
     }
     _stprintf(name, _T("%s.bce"), dbName);
     if (!backupCompletedEvent.open(name)) {
+        cleanup(status, 4);
         handleError(DatabaseOpenError,
                     "Failed to initialize database backup completed event");
-        cleanup(status, 4);
         return false;
     }
     if (commitDelaySec != 0) {
         _stprintf(name, _T("%s.dce"), dbName);
         delayedCommitEventsOpened = true;
         if (!delayedCommitStopTimerEvent.open(name)) {
+            cleanup(status, 5);
             handleError(DatabaseOpenError,
                         "Failed to initialize delayed commit event");
-            cleanup(status, 5);
             return false;
         }
         delayedCommitStartTimerEvent.open();
@@ -2550,16 +2550,16 @@ bool dbDatabase::open(char_t const* dbName, char_t const* fiName,
     if (status == dbInitializationMutex::NotYetInitialized) {
         _stprintf(name, _T("%s.cs"), dbName);
         if (!cs.create(name, &monitor->sem)) {
-            handleError(DatabaseOpenError, "Failed to initialize database monitor");
             cleanup(status, 6);
+            handleError(DatabaseOpenError, "Failed to initialize database monitor");
             return false;
         }
         if (accessType == dbConcurrentUpdate || accessType == dbConcurrentRead) {
             _stprintf(name, _T("%s.mcs"), dbName);
             if (!mutatorCS.create(name, &monitor->mutatorSem)) {
+                cleanup(status, 7);
                 handleError(DatabaseOpenError,
                             "Failed to initialize database monitor");
-                cleanup(status, 7);
                 return false;
             }
         }
@@ -2598,8 +2598,8 @@ bool dbDatabase::open(char_t const* dbName, char_t const* fiName,
             char msgbuf[64];
             file.errorText(rc, msgbuf, sizeof msgbuf);
             TRACE_MSG(("File open error: %s\n", msgbuf));
-            handleError(DatabaseOpenError, "Failed to create database file");
             cleanup(status, 8);
+            handleError(DatabaseOpenError, "Failed to create database file");
             return false;
         }
         baseAddr = (byte*)file.getAddr();
@@ -2608,16 +2608,16 @@ bool dbDatabase::open(char_t const* dbName, char_t const* fiName,
         updatedRecordId = 0;
 
         if ((unsigned)header->curr > 1) {
+            cleanup(status, 9);
             handleError(DatabaseOpenError, "Database file was corrupted: "
                         "invalid root index");
-            cleanup(status, 9);
             return false;
         }
         if (header->initialized != 1) {
             if (accessType == dbReadOnly || accessType == dbConcurrentRead) {
+                cleanup(status, 9);
                 handleError(DatabaseOpenError, "Can not open uninitialized "
                             "file in read only mode");
-                cleanup(status, 9);
                 return false;
             }
             monitor->curr = header->curr = 0;
@@ -2677,27 +2677,27 @@ bool dbDatabase::open(char_t const* dbName, char_t const* fiName,
             file.flush(true);
         } else {
             if (!header->isCompatible()) {
-                handleError(DatabaseOpenError, "Incompatible database mode");
                 cleanup(status, 9);
+                handleError(DatabaseOpenError, "Incompatible database mode");
                 return false;
             }
             monitor->curr = header->curr;
             if (header->dirty) {
                 TRACE_MSG(("Database was not normally closed: start recovery\n"));
                 if (accessType == dbReadOnly || accessType == dbConcurrentRead) {
+                    cleanup(status, 9);
                     handleError(DatabaseOpenError,
                                 "Can not open dirty file in read only mode");
-                    cleanup(status, 9);
                     return false;
                 }
                 recovery();
                 TRACE_MSG(("Recovery completed\n"));
             } else {
                 if (file.getSize() != header->size) {
+                    cleanup(status, 9);
                     handleError(DatabaseOpenError, "Database file was "
                                 "corrupted: file size in header differs "
                                 "from actual file size");
-                    cleanup(status, 9);
                     return false;
                 }
             }
@@ -2705,15 +2705,15 @@ bool dbDatabase::open(char_t const* dbName, char_t const* fiName,
     } else {
         _stprintf(name, _T("%s.cs"), dbName);
         if (!cs.open(name, &monitor->sem)) {
-            handleError(DatabaseOpenError, "Failed to open shared semaphore");
             cleanup(status, 6);
+            handleError(DatabaseOpenError, "Failed to open shared semaphore");
             return false;
         }
         if (accessType == dbConcurrentUpdate || accessType == dbConcurrentRead) {
             _stprintf(name, _T("%s.mcs"), dbName);
             if (!mutatorCS.open(name, &monitor->mutatorSem)) {
-                handleError(DatabaseOpenError, "Failed to open shared semaphore");
                 cleanup(status, 7);
+                handleError(DatabaseOpenError, "Failed to open shared semaphore");
                 return false;
             }
         }
@@ -7587,37 +7587,37 @@ bool dbReplicatedDatabase::open(char_t const* dbName, char_t const* fiName,
     }
     _stprintf(name, _T("%s.dm"), dbName);
     if (!shm.open(name)) {
-        handleError(DatabaseOpenError, "Failed to open database monitor");
         cleanup(status, 0);
+        handleError(DatabaseOpenError, "Failed to open database monitor");
         return false;
     }
     monitor = shm.get();
     _stprintf(name, _T("%s.ws"), dbName);
     if (!writeSem.open(name)) {
+        cleanup(status, 1);
         handleError(DatabaseOpenError,
                     "Failed to initialize database writers semaphore");
-        cleanup(status, 1);
         return false;
     }
     _stprintf(name, _T("%s.rs"), dbName);
     if (!readSem.open(name)) {
+        cleanup(status, 2);
         handleError(DatabaseOpenError,
                     "Failed to initialize database readers semaphore");
-        cleanup(status, 2);
         return false;
     }
     _stprintf(name, _T("%s.us"), dbName);
     if (!upgradeSem.open(name)) {
+        cleanup(status, 3);
         handleError(DatabaseOpenError,
                     "Failed to initialize database upgrade semaphore");
-        cleanup(status, 3);
         return false;
     }
     _stprintf(name, _T("%s.bce"), dbName);
     if (!backupCompletedEvent.open(name)) {
+        cleanup(status, 4);
         handleError(DatabaseOpenError,
                     "Failed to initialize database backup completed event");
-        cleanup(status, 4);
         return false;
     }
     backupInitEvent.open();
@@ -7652,8 +7652,8 @@ bool dbReplicatedDatabase::open(char_t const* dbName, char_t const* fiName,
 
     _stprintf(name, _T("%s.cs"), dbName);
     if (!cs.create(name, &monitor->sem)) {
-        handleError(DatabaseOpenError, "Failed to initialize database monitor");
         cleanup(status, 6);
+        handleError(DatabaseOpenError, "Failed to initialize database monitor");
         return false;
     }
     if (accessType == dbConcurrentUpdate || accessType == dbConcurrentRead) {
@@ -7696,8 +7696,8 @@ bool dbReplicatedDatabase::open(char_t const* dbName, char_t const* fiName,
     _stprintf(databaseName, _T("%s.%d"), dbName, version);
     if (file.open(fileName, databaseName, fileOpenFlags, fileSize, true) != dbFile::ok)
     {
-        handleError(DatabaseOpenError, "Failed to create database file");
         cleanup(status, 8);
+        handleError(DatabaseOpenError, "Failed to create database file");
         return false;
     }
     baseAddr = (byte*)file.getAddr();
@@ -7705,9 +7705,9 @@ bool dbReplicatedDatabase::open(char_t const* dbName, char_t const* fiName,
     header = (dbHeader*)baseAddr;
 
     if ((unsigned)header->curr > 1) {
+        cleanup(status, 9);
         handleError(DatabaseOpenError, "Database file was corrupted: "
                     "invalid root index");
-        cleanup(status, 9);
         return false;
     }
     acceptSock = socket_t::create_global(servers[id]);
@@ -7785,9 +7785,9 @@ bool dbReplicatedDatabase::open(char_t const* dbName, char_t const* fiName,
         con[id].status = (accessType == dbConcurrentRead) ? ST_RECOVERED : ST_ONLINE;
     } else {
         if (!header->isCompatible()) {
-            handleError(DatabaseOpenError, "Incompatible database mode");
             cleanup(status, 9);
             delete acceptSock;
+            handleError(DatabaseOpenError, "Incompatible database mode");
             return false;
         }
         monitor->curr = header->curr;
