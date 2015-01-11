@@ -143,7 +143,8 @@ class FASTDB_DLL_ENTRY dbProcessId {
 
 
 class FASTDB_DLL_ENTRY dbInitializationMutex { 
-    HANDLE m;
+    HANDLE initialized;
+    HANDLE mutex;
   public: 
     enum initializationStatus { 
         InitializationError, 
@@ -151,30 +152,35 @@ class FASTDB_DLL_ENTRY dbInitializationMutex {
         NotYetInitialized
     };
     initializationStatus initialize(char_t const* name) { 
-        initializationStatus status;
-        m = CreateMutex(FASTDB_SECURITY_ATTRIBUTES, true, name);
-        if (GetLastError() == ERROR_ALREADY_EXISTS) { 
-            status = WaitForSingleObject(m, INFINITE) == WAIT_OBJECT_0 
-                   ? AlreadyInitialized : InitializationError;
-        } else if (m != NULL) { 
-            status = NotYetInitialized;
-        } else { 
-            status = InitializationError;
+        char* buf = new char_t[_tcslen(name) + 8];
+        _stprintf(buf, _T("%s.mutex"), name);
+        mutex = CreateMutex(FASTDB_SECURITY_ATTRIBUTES, false, buf);
+        delete[] buf;
+        if (mutex == NULL || !WaitForSingleObject(mutex, INFINITE)) { 
+            return InitializationError;
         }
-        return status;
+        initialized = CreateMutex(FASTDB_SECURITY_ATTRIBUTES, true, name);
+        if (initialized == NULL) { 
+            CloseHandle(mutex);
+            return InitializationError;
+        } 
+        return (GetLastError() == ERROR_ALREADY_EXISTS) ? AlreadyInitialized : NotYetInitialized;
     }
     void done() { 
-        ReleaseMutex(m);
-    }
+        ReleaseMutex(mutex);
+    }        
     bool close() {
-        WaitForSingleObject(m, INFINITE); // lock mutex
+        WaitForSingleObject(mutex, INFINITE); // lock mutex
         return true;
     }
     void erase() { 
-        CloseHandle(m);
+        CloseHandle(initialized);
+        ReleaseMutex(mutex);        
+        CloseHandle(mutex);
     }
     dbInitializationMutex() { 
-        m = NULL;
+        mutex = NULL;
+        initialized = NULL;
     }
 };
 
