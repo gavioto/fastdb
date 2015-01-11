@@ -3143,6 +3143,7 @@ void dbDatabase::createHashTable(dbFieldDescriptor* fd)
     table = (dbTable*)putRow(fd->defTable->tableId);
     dbField* field = (dbField*)((char*)table + table->fields.offs);
     field[fd->fieldNo].hashTable = fd->hashTable;
+    field[fd->fieldNo].flags = fd->indexType;
 
     for (oid_t oid = table->firstRow; oid != 0; oid = getRow(oid)->next) {
         dbHashTable::insert(this, fd, oid, nRows);
@@ -3166,6 +3167,7 @@ void dbDatabase::createIndex(dbFieldDescriptor* fd)
     dbTable* table = (dbTable*)putRow(fd->defTable->tableId);
     dbField* field = (dbField*)((char*)table + table->fields.offs);
     field[fd->fieldNo].tTree = fd->tTree;
+    field[fd->fieldNo].flags = fd->indexType;
 
     for (oid_t oid = table->firstRow; oid != 0; oid = getRow(oid)->next) {
         if (fd->type == dbField::tpRectangle) {
