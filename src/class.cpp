@@ -1568,10 +1568,6 @@ bool dbTableDescriptor::match(dbTable* table, bool confirmDeleteColumns, bool is
             }
         }
     }
-    if (!confirmDeleteColumns) {             
-        assert(((void)"field can be removed only from empty table",
-                nFields==nMatches));
-    }
     return formatNotChanged;
 }
 
