@@ -837,7 +837,7 @@ jobjectArray JNICALL jniGetStringArray(JNIEnv* env, jclass, jlong cursor)
     return ((JniResultSet*)cursor)->nextStringArray(env);
 }
 
-jint JNICALL    jniGetNumberOfSelectedRecords(JNIEnv* env, jclass, long cursor)
+jint JNICALL    jniGetNumberOfSelectedRecords(JNIEnv* env, jclass, jlong cursor)
 {
     return ((JniResultSet*)cursor)->size();
 }
