@@ -19,9 +19,9 @@ public class DatabaseJNI implements Database {
                 classes.put(c, desc);
                 desc.td = jniUpdateTable(db, table, getTableDescriptor(desc)); 
             } catch (ClassNotFoundException x) { 
-                new CliException("Class '" + table + "' not found");
+                throw new CliException("Class '" + table + "' not found");
             } catch (Exception x) { 
-                new CliException(x.getMessage());
+                throw new CliException(x.getMessage());
             }
         }
     }
