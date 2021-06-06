@@ -24,7 +24,7 @@ public interface Cursor { // extends Enumeration { // if Cursor is derived from 
      * object has at least one more element to provide.
      *
      * @return     the next element of this enumeration.
-     * @exception  NoSuchElementException  if no more elements exist.
+     * @exception  java.util.NoSuchElementException  if no more elements exist.
      */
     Object nextElement();
 

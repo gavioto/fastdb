@@ -403,10 +403,10 @@ jnicli.jar: jnicli\*.java
 	javadoc -d jnicli/docs -public jnicli\*.java
 
 examples/CliTest.class: examples/CliTest.java javacli.jar
-	javac -classpath .;javacli.jar examples\CliTest.java
+	javac -classpath javacli.jar examples\CliTest.java
 
 examples/TestIndex.class: examples/TestIndex.java javacli.jar
-	javac -classpath .;javacli.jar examples\TestIndex.java
+	javac -classpath javacli.jar examples\TestIndex.java
 
 examples/JniTestIndex.class: examples/JniTestIndex.java jnicli.jar
 	javac -g -classpath jnicli.jar examples\JniTestIndex.java

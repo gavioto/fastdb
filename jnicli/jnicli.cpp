@@ -316,13 +316,13 @@ class JniDatabase : public dbDatabase {
             return;
         }
         dbTable* table = (dbTable*)getRow(dbMetaTableId);
-        dbTableDescriptor* metatable = new dbTableDescriptor(table);
+        dbTableDescriptor* metatable = new dbTableDescriptor(this, table);
         linkTable(metatable, dbMetaTableId);
         oid_t tid = table->firstRow;
         nextTableId = tid;
         while (tid != 0) {
             table = (dbTable*)getRow(tid);
-            dbTableDescriptor* desc = new dbTableDescriptor(table);
+            dbTableDescriptor* desc = new dbTableDescriptor(this, table);
             linkTable(desc, tid);
             desc->setFlags();
             tid = table->next;
@@ -635,7 +635,7 @@ void JNICALL   jniSetShortArray(JNIEnv* env, jclass, jlong bptr, jshortArray v)
 {
     ObjectBuffer* buf = (ObjectBuffer*)bptr;
     size_t len = 0;
-    SHORT* elems = NULL;
+    short* elems = NULL;
     if (v != NULL) { 
         jshort* shorts = env->GetShortArrayElements(v, 0);
         len = env->GetArrayLength(v);
@@ -837,7 +837,7 @@ jobjectArray JNICALL jniGetStringArray(JNIEnv* env, jclass, jlong cursor)
     return ((JniResultSet*)cursor)->nextStringArray(env);
 }
 
-jint JNICALL    jniGetNumberOfSelectedRecords(JNIEnv* env, jclass, long cursor)
+jint JNICALL    jniGetNumberOfSelectedRecords(JNIEnv* env, jclass, jlong cursor)
 {
     return ((JniResultSet*)cursor)->size();
 }

@@ -432,10 +432,10 @@ examples/JniTestRelations.class: examples/JniTestRelations.java jnicli.jar
 	javac -classpath jnicli.jar examples/JniTestRelations.java
 
 examples/CliTest.class: examples/CliTest.java javacli.jar
-	javac -classpath .;javacli.jar examples/CliTest.java
+	javac -classpath javacli.jar examples/CliTest.java
 
 examples/TestIndex.class: examples/TestIndex.java javacli.jar
-	javac -classpath .;javacli.jar examples/TestIndex.java
+	javac -classpath javacli.jar examples/TestIndex.java
 
 install: subsql cleanupsem inspectsem installlib
 	mkdir -p $(BINSPATH)
