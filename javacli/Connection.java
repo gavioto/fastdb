@@ -184,11 +184,11 @@ public class Connection {
     /**
      * Create table matching specified class.  Name of the table is equal
      * to class name without any package prefixes. This table will include columns
-     * corresponsinf to all non-static and non-transient fields of specified class and base classes
+     * corresponding to all non-static and non-transient fields of specified class and base classes
      * of this class. 
      * @param cls Java class for which table should be created.
-     * @return <code>true</code> if table sucessfully created, <code>false</code> if table already exists
-     * @exception throws CliError exception in case of all other errors (except table already exists)
+     * @return <code>true</code> if table successfully created, <code>false</code> if table already exists
+     * @exception CliError exception in case of all other errors (except table already exists)
      */
     public boolean createTable(Class cls) 
     {
@@ -199,13 +199,13 @@ public class Connection {
     /**
      * Create table matching specified class.  Name of the table is equal
      * to class name without any package prefixes. This table will include columns
-     * corresponsinf to all non-static and non-transient fields of specified class and base classes
+     * corresponding to all non-static and non-transient fields of specified class and base classes
      * of this class. 
      * @param cls Java class for which table should be created.
      * @param referenceMap map to provide names of referenced tables for reference fields.
      * Key of this map is field name.
      * @return <code>true</code> if table sucessfully created, <code>false</code> if table already exists
-     * @exception throws CliError exception in case of all other errors (except table already exists)
+     * @exception CliError exception in case of all other errors (except table already exists)
      */
     public boolean createTable(Class cls, HashMap referenceMap) 
     {
